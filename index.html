@@ -120,6 +120,8 @@ h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
 .exnav button.primary{background:var(--amber);color:#0B0A09;border-color:var(--amber)}
 .addset{background:none;border:1px dashed rgba(255,255,255,.22);color:var(--mut);border-radius:10px;padding:10px;width:100%;font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-top:12px;cursor:pointer}
 .sum-stat{text-align:center}.sum-stat .v{font-size:30px;font-weight:800}
+.pickrow{display:flex;align-items:center;justify-content:space-between;padding:16px 2px;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer}
+.pickrow:active{background:rgba(255,255,255,.04)}
 </style>
 </head>
 <body>
@@ -163,10 +165,10 @@ h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
 
       <div class="deck">
         <div class="vlab lab mut">On deck</div>
-        <div style="flex:1">
-          <div class="tile t-session"><span class="tlab lab">Today · Push</span></div>
-          <p class="cap">Chest &amp; Triceps</p>
-          <p class="cap-sub"><span style="color:var(--rust)">Smith bench 340</span><span class="mut"> · 7 moves</span></p>
+        <div style="flex:1" onclick="startSession()">
+          <div class="tile t-session" style="cursor:pointer"><span class="tlab lab">Today</span></div>
+          <p class="cap">Start a session</p>
+          <p class="cap-sub"><span style="color:var(--rust)">Pick your workout</span><span class="mut"> · 5 days</span></p>
         </div>
         <div style="flex:1;padding-top:42px">
           <div class="tile t-detail" style="height:166px"><span class="tlab lab">This block</span>
@@ -273,16 +275,64 @@ function go(name){
   window.scrollTo(0,0);
 }
 
-/* ---- today's session template (Ryan's push day) ---- */
-var SESSION={ name:"Chest & Triceps", ex:[
-  {n:"Smith Machine Bench Press", note:"Last 315 × 4 · target 340", sets:[{w:315,r:4},{w:335,r:1},{w:340,r:1}]},
-  {n:"Incline Bench Press", note:"Last 225 × 8", sets:[{w:225,r:8},{w:205,r:6},{w:225,r:6}]},
-  {n:"Machine Chest Flye", note:"Last 115 × 12", sets:[{w:85,r:12},{w:100,r:12},{w:115,r:12}]},
-  {n:"Dumbbell Chest Press", note:"Last 80 × 10", sets:[{w:75,r:12},{w:80,r:10}]},
-  {n:"Triceps Pushdown", note:"3 working sets", sets:[{w:60,r:12},{w:60,r:12},{w:60,r:10}]},
-  {n:"Skull Crusher", note:"Last 75 × 10", sets:[{w:75,r:10},{w:65,r:12}]},
-  {n:"Cable Crunch", note:"Abs finisher", sets:[{w:85,r:20},{w:85,r:20}]}
-]};
+/* ---- Ryan's workout templates (from his real log; weights are starting points) ---- */
+var PROGRAM = {
+  "chest-tri": { name:"Chest + Triceps", ex:[
+    {n:"Smith Machine Bench Press", note:"Last 315 × 4 · top 335 × 1", sets:[{w:315,r:4},{w:335,r:1}]},
+    {n:"Incline Press", sets:[{w:225,r:8},{w:205,r:6},{w:225,r:6}]},
+    {n:"Machine Flye", sets:[{w:85,r:12},{w:100,r:12},{w:115,r:12}]},
+    {n:"DB Chest Press", sets:[{w:75,r:12},{w:80,r:10}]},
+    {n:"Triceps Pushdown", sets:[{w:25,r:12},{w:25,r:12},{w:25,r:12}]},
+    {n:"Skull Crusher", sets:[{w:75,r:10}]},
+    {n:"Single-Arm Extension", sets:[{w:25,r:12}]},
+    {n:"Cable Crunch", note:"Abs", sets:[{w:85,r:20}]},
+    {n:"Hanging Knee Raise", note:"Abs", sets:[{w:0,r:10}]}
+  ]},
+  "back-bi": { name:"Back + Biceps", ex:[
+    {n:"Barbell Row", note:"Last 205 × 5 · top 235 × 4", sets:[{w:205,r:5},{w:235,r:4}]},
+    {n:"Single-Arm Row", sets:[{w:70,r:12},{w:75,r:10},{w:80,r:10}]},
+    {n:"Lat Pulldown", sets:[{w:140,r:12},{w:160,r:10},{w:180,r:8}]},
+    {n:"Cable Row", sets:[{w:140,r:12},{w:160,r:10},{w:180,r:10}]},
+    {n:"Straight-Arm Pulldown", sets:[{w:42.5,r:15},{w:50,r:12},{w:50,r:12}]},
+    {n:"Reverse Pec Deck", sets:[{w:100,r:15},{w:115,r:12},{w:130,r:10}]},
+    {n:"Face Pull", sets:[{w:50,r:15},{w:57.5,r:12},{w:65,r:10}]},
+    {n:"EZ Bar Curl", sets:[{w:75,r:10},{w:75,r:10},{w:75,r:8}]},
+    {n:"Hammer Curl", sets:[{w:45,r:8},{w:35,r:10}]},
+    {n:"Cable Crunch", note:"Abs", sets:[{w:70,r:20}]}
+  ]},
+  "shoulders": { name:"Shoulders + Core", ex:[
+    {n:"Smith Machine OHP", note:"Last top 245 × 5", sets:[{w:185,r:5},{w:225,r:4},{w:245,r:4}]},
+    {n:"Lateral Raise", sets:[{w:20,r:15},{w:25,r:15},{w:30,r:12}]},
+    {n:"Face Pull", sets:[{w:55,r:15},{w:60,r:12},{w:65,r:12}]},
+    {n:"Rear Delt Fly", sets:[{w:50,r:15},{w:60,r:12},{w:70,r:10}]},
+    {n:"Front Raise", sets:[{w:25,r:12},{w:25,r:12},{w:30,r:10}]},
+    {n:"DB Shoulder Press", sets:[{w:70,r:10},{w:85,r:8},{w:100,r:5}]},
+    {n:"Upright Row", sets:[{w:95,r:12},{w:110,r:10}]},
+    {n:"Cable Crunch", note:"Abs", sets:[{w:80,r:20}]},
+    {n:"Hanging Knee Raise", note:"Abs", sets:[{w:0,r:10}]}
+  ]},
+  "legs": { name:"Legs", ex:[
+    {n:"Leg Press", note:"Last top 500 × 6", sets:[{w:450,r:6},{w:500,r:6}]},
+    {n:"Leg Extension", sets:[{w:110,r:15},{w:120,r:12},{w:130,r:10},{w:145,r:8}]},
+    {n:"Leg Curl", sets:[{w:110,r:15},{w:120,r:12},{w:130,r:10}]},
+    {n:"Smith RDL", sets:[{w:155,r:15},{w:165,r:12},{w:175,r:10}]},
+    {n:"Hack Squat", sets:[{w:125,r:10},{w:125,r:10},{w:125,r:10}]},
+    {n:"Single Leg Press", sets:[{w:100,r:12},{w:110,r:10}]},
+    {n:"Cable Crunch", note:"Abs", sets:[{w:82.5,r:20}]}
+  ]},
+  "arms": { name:"Arms + Abs", ex:[
+    {n:"Smith Close-Grip Bench", note:"Last top 205 × 4", sets:[{w:165,r:6},{w:185,r:6},{w:205,r:4}]},
+    {n:"EZ Bar Curl", sets:[{w:75,r:10},{w:75,r:10},{w:75,r:8}]},
+    {n:"Cable Pushdown", sets:[{w:100,r:12},{w:115,r:10},{w:120,r:8}]},
+    {n:"Smith Skull Crusher", sets:[{w:115,r:10},{w:135,r:8},{w:145,r:5}]},
+    {n:"Overhead Extension", sets:[{w:60,r:12},{w:70,r:10},{w:80,r:8}]},
+    {n:"Hammer Curl", sets:[{w:45,r:12},{w:50,r:10}]},
+    {n:"Weighted Dips", sets:[{w:35,r:10},{w:35,r:10}]},
+    {n:"Cable Crunch", note:"Abs", sets:[{w:85,r:20}]},
+    {n:"Ab Wheel", note:"Abs", sets:[{w:0,r:10}]}
+  ]}
+};
+var DAY_ORDER = ["chest-tri","back-bi","shoulders","legs","arms"];
 
 var S=null, clockTimer=null, restTimer=null, rest=0;
 
@@ -301,42 +351,51 @@ function pushWidget(){
     var st = loadState();
     var payload = {
       date: new Date().toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' }),
-      session: SESSION.name, focus: "Push", moves: SESSION.ex.length,
-      target: "Smith bench 340", recovery: 86,
+      session: st.lastSessionName || "Ready to train",
+      target: "Recomp · Week " + (st.week || 4), moves: 0, recovery: 86,
       streak: st.streak || 23, weekSessions: (st.week || 4) + "/5",
-      bodyweight: 198.4, lastPR: "Row 235 × 4",
-      lastSession: st.lastSession || "Push · 18.2k"
+      bodyweight: 186.6, lastPR: st.lastSession || "Leg Press 500 × 6",
+      lastSession: st.lastSession || "—"
     };
     fetch(VAL_URL, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload), keepalive:true }).catch(function(){});
   } catch(e){}
 }
-function newSession(){ return { startedAt:Date.now(), ei:0, done:false,
-  ex:SESSION.ex.map(function(e){return {n:e.n,note:e.note,sets:e.sets.map(function(s){return {w:s.w,r:s.r,done:false}})}}) }; }
+function newSession(key){ var t=PROGRAM[key]; return { key:key, name:t.name, startedAt:Date.now(), ei:0, done:false,
+  ex:t.ex.map(function(e){return {n:e.n,note:e.note,sets:e.sets.map(function(s){return {w:s.w,r:s.r,done:false}})}}) }; }
 
-function startSession(){ S=S||loadActive()||newSession(); saveActive(); go('train'); startClock(); renderLogger(); }
+function startSession(){ S=loadActive()||null; go('train'); if(S&&!S.done) startClock(); renderLogger(); }
+function beginSession(key){ S=newSession(key); saveActive(); go('train'); startClock(); renderLogger(); }
+function renderPicker(){
+  var box=document.getElementById('logger'); if(!box) return;
+  var h='<p class="lab mut" style="margin-top:14px">Start a session</p><h1 class="title" style="margin-top:8px">Choose your workout</h1><div style="margin-top:18px">';
+  DAY_ORDER.forEach(function(k){ var t=PROGRAM[k];
+    h+='<div class="pickrow" onclick="beginSession(\''+k+'\')"><div><p style="font-size:16px;font-weight:700">'+t.name+'</p><p class="mut" style="font-size:12px;margin-top:3px">'+t.ex.length+' movements</p></div><i class="ti ti-chevron-right" style="font-size:20px;color:var(--mut)"></i></div>';
+  });
+  h+='</div>'; box.innerHTML=h;
+}
 function startClock(){ clearInterval(clockTimer); clockTimer=setInterval(function(){ var el=document.getElementById('sessClock'); if(el&&S&&!S.done) el.textContent=fmt(Math.floor((Date.now()-S.startedAt)/1000)); },1000); }
 function startRest(sec){ rest=sec; clearInterval(restTimer); var upd=function(){ var el=document.getElementById('restClock'); if(el) el.textContent=rest>0?fmt(rest):'Ready'; }; upd();
   restTimer=setInterval(function(){ rest--; if(rest<=0){clearInterval(restTimer);rest=0;} upd(); },1000); }
 
 function renderLogger(){
   var box=document.getElementById('logger'); if(!box) return;
-  if(!S){ box.innerHTML='<div style="padding:60px 0;text-align:center"><p class="lab mut">No active session</p><p class="mut" style="margin-top:8px;font-size:13px">Start today’s Chest &amp; Triceps.</p><div class="cta" style="margin-top:22px"><button onclick="startSession()"><i class="ti ti-player-play"></i>Start session</button></div></div>'; return; }
+  if(!S){ return renderPicker(); }
   if(S.done){ return renderSummary(); }
   var e=S.ex[S.ei], n=S.ex.length, el=fmt(Math.floor((Date.now()-S.startedAt)/1000)), h='';
-  h+='<div class="lg-head"><span class="lab mut">'+SESSION.name+'</span><span style="display:flex;align-items:center;gap:7px;color:var(--amber)"><span style="width:6px;height:6px;border-radius:50%;background:var(--amber)"></span><span class="n" id="sessClock" style="font-size:13px;font-weight:600">'+el+'</span></span></div>';
+  h+='<div class="lg-head"><span class="lab mut">'+S.name+'</span><span style="display:flex;align-items:center;gap:7px;color:var(--amber)"><span style="width:6px;height:6px;border-radius:50%;background:var(--amber)"></span><span class="n" id="sessClock" style="font-size:13px;font-weight:600">'+el+'</span></span></div>';
   h+='<div class="lg-prog"><span style="width:'+(S.ei/n*100)+'%"></span></div>';
   h+='<p class="lab mut" style="margin-top:16px">Movement '+pad(S.ei+1)+' / '+pad(n)+'</p>';
   h+='<h1 class="title" style="margin-top:8px">'+e.n+'</h1>';
   if(e.note) h+='<p class="mut" style="margin-top:8px;font-size:13px">'+e.note+'</p>';
   h+='<div style="margin-top:16px">';
-  e.sets.forEach(function(s,si){ h+='<div class="lset'+(s.done?' done':'')+'"><span class="lab mut2" style="letter-spacing:.12em">Set '+pad(si+1)+'</span><span class="lw n" onclick="editSet('+si+')">'+s.w+' <span class="mut2">lb</span> × '+s.r+'</span><span class="chk'+(s.done?' on':'')+'" onclick="toggleSet('+si+')"><i class="ti ti-check"></i></span></div>'; });
+  e.sets.forEach(function(s,si){ h+='<div class="lset'+(s.done?' done':'')+'"><span class="lab mut2" style="letter-spacing:.12em">Set '+pad(si+1)+'</span><span class="lw n" onclick="editSet('+si+')">'+(s.w>0?(s.w+' <span class="mut2">lb</span> × '+s.r):('<span class="mut2">BW</span> × '+s.r))+'</span><span class="chk'+(s.done?' on':'')+'" onclick="toggleSet('+si+')"><i class="ti ti-check"></i></span></div>'; });
   h+='</div><button class="addset" onclick="addSet()">+ Add set</button>';
   h+='<div class="rest"><span class="lab mut" style="display:flex;align-items:center;gap:7px"><i class="ti ti-clock" style="font-size:15px"></i>Rest</span><span class="timer n" id="restClock">'+(rest>0?fmt(rest):'Ready')+'</span></div>';
   h+='<div class="exnav">'+(S.ei>0?'<button onclick="prevEx()">Previous</button>':'')+(S.ei<n-1?'<button class="primary" onclick="nextEx()">Next movement</button>':'<button class="primary" onclick="finishSession()">Finish session</button>')+'</div>';
   box.innerHTML=h;
 }
 function toggleSet(si){ var s=S.ex[S.ei].sets[si]; s.done=!s.done; saveActive(); if(s.done) startRest(90); renderLogger(); }
-function editSet(si){ var s=S.ex[S.ei].sets[si]; var v=prompt('Weight x reps (e.g. 315x4)', s.w+'x'+s.r); if(v){ var m=v.toLowerCase().split('x'); var w=parseInt(m[0],10), r=parseInt(m[1],10); if(!isNaN(w))s.w=w; if(!isNaN(r))s.r=r; saveActive(); renderLogger(); } }
+function editSet(si){ var s=S.ex[S.ei].sets[si]; var v=prompt('Weight x reps (e.g. 315x4)', s.w+'x'+s.r); if(v){ var m=v.toLowerCase().split('x'); var w=parseFloat(m[0]), r=parseInt(m[1],10); if(!isNaN(w))s.w=w; if(!isNaN(r))s.r=r; saveActive(); renderLogger(); } }
 function addSet(){ var a=S.ex[S.ei].sets, l=a[a.length-1]||{w:0,r:0}; a.push({w:l.w,r:l.r,done:false}); saveActive(); renderLogger(); }
 function prevEx(){ if(S.ei>0){S.ei--;rest=0;saveActive();renderLogger();} }
 function nextEx(){ if(S.ei<S.ex.length-1){S.ei++;rest=0;saveActive();renderLogger();} }
@@ -347,13 +406,14 @@ function finishSession(){
   S.vol=vol; S.sets=sets; S.dur=Math.floor((Date.now()-S.startedAt)/1000);
   var st=loadState(), t=todayStr(); st.history=st.history||[]; st.history.push({date:t,vol:vol,sets:sets});
   if(st.lastLogged!==t){ st.streak=(st.streak?st.streak+1:24); st.week=(st.week?st.week+1:5); }
-  st.lastSession = SESSION.name + " · " + (vol/1000).toFixed(1) + "k";
+  st.lastSessionName = S.name;
+  st.lastSession = S.name + " · " + (vol/1000).toFixed(1) + "k";
   st.lastLogged=t; saveState(st); clearActive(); clearInterval(restTimer); renderLogger(); refreshToday(); pushWidget();
 }
 function renderSummary(){
   var box=document.getElementById('logger'); if(!box||!S) return;
   var mins=Math.max(1,Math.round(S.dur/60)), h='<div style="padding-top:6px">';
-  h+='<p class="lab" style="color:var(--amber);margin-top:8px">Session complete</p><h1 class="title" style="margin-top:8px">'+SESSION.name+'</h1>';
+  h+='<p class="lab" style="color:var(--amber);margin-top:8px">Session complete</p><h1 class="title" style="margin-top:8px">'+S.name+'</h1>';
   h+='<p class="mut" style="margin-top:8px;font-size:13px">Logged for today — nice work.</p>';
   h+='<div style="display:flex;gap:10px;margin-top:24px">';
   h+='<div class="metric sum-stat" style="flex:1"><p class="v n">'+(S.vol/1000).toFixed(1)+'k</p><p class="lab mut2" style="margin-top:4px">Volume lb</p></div>';
