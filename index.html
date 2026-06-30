@@ -106,6 +106,20 @@ h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
 .nav button i{font-size:23px}
 .nav button.active{color:#fff}
 .section-lab{margin:24px 0 12px}
+.lg-head{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+.lg-prog{height:3px;background:rgba(255,255,255,.14);border-radius:3px;margin-top:14px;overflow:hidden}
+.lg-prog>span{display:block;height:3px;background:var(--amber);border-radius:3px;transition:width .3s}
+.lset{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.lset.done .lw{color:var(--mut)}
+.lw{font-size:16px;cursor:pointer}
+.chk{width:30px;height:30px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;color:transparent}
+.chk.on{background:var(--green);border-color:var(--green);color:#0B0A09}
+.chk i{font-size:18px}
+.exnav{display:flex;gap:10px;margin-top:20px}
+.exnav button{flex:1;background:rgba(255,255,255,.06);color:var(--bone);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:14px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer}
+.exnav button.primary{background:var(--amber);color:#0B0A09;border-color:var(--amber)}
+.addset{background:none;border:1px dashed rgba(255,255,255,.22);color:var(--mut);border-radius:10px;padding:10px;width:100%;font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-top:12px;cursor:pointer}
+.sum-stat{text-align:center}.sum-stat .v{font-size:30px;font-weight:800}
 </style>
 </head>
 <body>
@@ -132,9 +146,9 @@ h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
       <div class="cards">
         <div class="glass">
           <div style="display:flex;justify-content:space-between;align-items:center"><span class="lab mut">This week</span><span style="font-size:13px;font-weight:600">Week 3</span></div>
-          <div class="bars"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span></span></div>
+          <div class="bars" id="todayBars"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span></span></div>
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <span class="n" style="font-size:14px;font-weight:500;color:rgba(245,242,236,.82)">4 / 5 sessions</span>
+            <span class="n" style="font-size:14px;font-weight:500;color:rgba(245,242,236,.82)"><span id="todayWeek">4</span> / 5 sessions</span>
             <span class="n" style="font-size:14px;font-weight:600;color:var(--green)">48.2k lb</span>
           </div>
         </div>
@@ -165,31 +179,16 @@ h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
 
       <div class="stats">
         <div><p class="v n">8<span style="color:var(--mut2);font-size:13px">/7</span></p><p class="lab mut2" style="margin-top:3px">Sessions</p></div>
-        <div><p class="v n">23</p><p class="lab mut2" style="margin-top:3px">Streak</p></div>
+        <div><p class="v n" id="todayStreak">23</p><p class="lab mut2" style="margin-top:3px">Streak</p></div>
         <div><p class="v n">12.4<span style="color:var(--mut2);font-size:13px">%</span></p><p class="lab mut2" style="margin-top:3px">Body fat</p></div>
       </div>
 
-      <div class="cta"><button onclick="go('train')"><i class="ti ti-player-play"></i>Start session</button></div>
+      <div class="cta"><button onclick="startSession()"><i class="ti ti-player-play"></i>Start session</button></div>
     </section>
 
-    <!-- TRAIN / SESSION -->
+    <!-- TRAIN / SESSION (rendered by JS) -->
     <section class="screen" data-screen="train">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
-        <span class="lab mut">Chest &amp; Triceps</span>
-        <span style="display:flex;align-items:center;gap:7px;color:var(--amber)"><span style="width:6px;height:6px;border-radius:50%;background:var(--amber)"></span><span class="n" id="sessClock" style="font-size:13px;font-weight:600;letter-spacing:.05em">42:18</span></span>
-      </div>
-      <p class="lab mut" style="margin-top:22px">Movement 03 / 07</p>
-      <h1 class="title">Smith Machine<br>Bench Press</h1>
-      <p class="mut" style="margin-top:8px;font-size:13px">Last session — 315 × 4 · target 340 × 1</p>
-
-      <div style="margin-top:18px">
-        <div class="setrow"><span class="lab mut2" style="letter-spacing:.12em">Set 01</span><span class="w n">315 <span class="mut2">lb</span> × 4</span><i class="ti ti-circle-check" style="font-size:18px;color:var(--green)"></i></div>
-        <div class="setrow"><span style="display:flex;gap:8px;align-items:center"><span class="lab mut2" style="letter-spacing:.12em">Set 02</span><span class="badge">PR</span></span><span class="w n" style="color:var(--amber)">335 lb × 1</span><i class="ti ti-circle-check" style="font-size:18px;color:var(--green)"></i></div>
-        <div class="setcur"><span class="lab" style="color:var(--amber);letter-spacing:.12em">Set 03</span><span class="w n" style="font-size:17px">340 <span class="mut2">lb</span> × 1</span><i class="ti ti-pencil mut2" style="font-size:15px"></i></div>
-      </div>
-
-      <div class="rest"><span class="lab mut" style="display:flex;align-items:center;gap:7px"><i class="ti ti-clock" style="font-size:15px"></i>Rest</span><span class="timer n" id="restClock">1:30</span></div>
-      <button class="btn-full" id="completeBtn" onclick="completeSet()">Complete set</button>
+      <div id="logger"></div>
     </section>
 
     <!-- PROGRESS -->
@@ -267,25 +266,98 @@ h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
 function go(name){
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.dataset.screen===name));
   document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
-  var warm = (name==='today');
-  document.getElementById('glow').style.opacity = warm?1:0.35;
-  document.getElementById('glow2').style.opacity = warm?1:0.6;
+  var warm=(name==='today');
+  document.getElementById('glow').style.opacity=warm?1:0.35;
+  document.getElementById('glow2').style.opacity=warm?1:0.6;
+  if(name==='train'){ if(S) startClock(); renderLogger(); }
   window.scrollTo(0,0);
 }
-var rest=90, restTimer=null;
-function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
-function completeSet(){
-  var btn=document.getElementById('completeBtn'), clk=document.getElementById('restClock');
-  clearInterval(restTimer); rest=90; clk.textContent=fmt(rest);
-  btn.textContent='Resting…';
-  restTimer=setInterval(function(){
-    rest--; clk.textContent=fmt(rest);
-    if(rest<=0){clearInterval(restTimer); clk.textContent='Ready'; btn.textContent='Complete set';}
-  },1000);
+
+/* ---- today's session template (Ryan's push day) ---- */
+var SESSION={ name:"Chest & Triceps", ex:[
+  {n:"Smith Machine Bench Press", note:"Last 315 × 4 · target 340", sets:[{w:315,r:4},{w:335,r:1},{w:340,r:1}]},
+  {n:"Incline Bench Press", note:"Last 225 × 8", sets:[{w:225,r:8},{w:205,r:6},{w:225,r:6}]},
+  {n:"Machine Chest Flye", note:"Last 115 × 12", sets:[{w:85,r:12},{w:100,r:12},{w:115,r:12}]},
+  {n:"Dumbbell Chest Press", note:"Last 80 × 10", sets:[{w:75,r:12},{w:80,r:10}]},
+  {n:"Triceps Pushdown", note:"3 working sets", sets:[{w:60,r:12},{w:60,r:12},{w:60,r:10}]},
+  {n:"Skull Crusher", note:"Last 75 × 10", sets:[{w:75,r:10},{w:65,r:12}]},
+  {n:"Cable Crunch", note:"Abs finisher", sets:[{w:85,r:20},{w:85,r:20}]}
+]};
+
+var S=null, clockTimer=null, restTimer=null, rest=0;
+
+function fmt(s){ if(s<0)s=0; return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+function pad(n){ return String(n).padStart(2,'0'); }
+function loadState(){ try{return JSON.parse(localStorage.getItem('meridian_state'))||{}}catch(e){return {}} }
+function saveState(s){ localStorage.setItem('meridian_state',JSON.stringify(s)); }
+function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function loadActive(){ try{return JSON.parse(localStorage.getItem('meridian_active'))}catch(e){return null} }
+function saveActive(){ if(S) localStorage.setItem('meridian_active',JSON.stringify(S)); }
+function clearActive(){ localStorage.removeItem('meridian_active'); }
+function newSession(){ return { startedAt:Date.now(), ei:0, done:false,
+  ex:SESSION.ex.map(function(e){return {n:e.n,note:e.note,sets:e.sets.map(function(s){return {w:s.w,r:s.r,done:false}})}}) }; }
+
+function startSession(){ S=S||loadActive()||newSession(); saveActive(); go('train'); startClock(); renderLogger(); }
+function startClock(){ clearInterval(clockTimer); clockTimer=setInterval(function(){ var el=document.getElementById('sessClock'); if(el&&S&&!S.done) el.textContent=fmt(Math.floor((Date.now()-S.startedAt)/1000)); },1000); }
+function startRest(sec){ rest=sec; clearInterval(restTimer); var upd=function(){ var el=document.getElementById('restClock'); if(el) el.textContent=rest>0?fmt(rest):'Ready'; }; upd();
+  restTimer=setInterval(function(){ rest--; if(rest<=0){clearInterval(restTimer);rest=0;} upd(); },1000); }
+
+function renderLogger(){
+  var box=document.getElementById('logger'); if(!box) return;
+  if(!S){ box.innerHTML='<div style="padding:60px 0;text-align:center"><p class="lab mut">No active session</p><p class="mut" style="margin-top:8px;font-size:13px">Start today’s Chest &amp; Triceps.</p><div class="cta" style="margin-top:22px"><button onclick="startSession()"><i class="ti ti-player-play"></i>Start session</button></div></div>'; return; }
+  if(S.done){ return renderSummary(); }
+  var e=S.ex[S.ei], n=S.ex.length, el=fmt(Math.floor((Date.now()-S.startedAt)/1000)), h='';
+  h+='<div class="lg-head"><span class="lab mut">'+SESSION.name+'</span><span style="display:flex;align-items:center;gap:7px;color:var(--amber)"><span style="width:6px;height:6px;border-radius:50%;background:var(--amber)"></span><span class="n" id="sessClock" style="font-size:13px;font-weight:600">'+el+'</span></span></div>';
+  h+='<div class="lg-prog"><span style="width:'+(S.ei/n*100)+'%"></span></div>';
+  h+='<p class="lab mut" style="margin-top:16px">Movement '+pad(S.ei+1)+' / '+pad(n)+'</p>';
+  h+='<h1 class="title" style="margin-top:8px">'+e.n+'</h1>';
+  if(e.note) h+='<p class="mut" style="margin-top:8px;font-size:13px">'+e.note+'</p>';
+  h+='<div style="margin-top:16px">';
+  e.sets.forEach(function(s,si){ h+='<div class="lset'+(s.done?' done':'')+'"><span class="lab mut2" style="letter-spacing:.12em">Set '+pad(si+1)+'</span><span class="lw n" onclick="editSet('+si+')">'+s.w+' <span class="mut2">lb</span> × '+s.r+'</span><span class="chk'+(s.done?' on':'')+'" onclick="toggleSet('+si+')"><i class="ti ti-check"></i></span></div>'; });
+  h+='</div><button class="addset" onclick="addSet()">+ Add set</button>';
+  h+='<div class="rest"><span class="lab mut" style="display:flex;align-items:center;gap:7px"><i class="ti ti-clock" style="font-size:15px"></i>Rest</span><span class="timer n" id="restClock">'+(rest>0?fmt(rest):'Ready')+'</span></div>';
+  h+='<div class="exnav">'+(S.ei>0?'<button onclick="prevEx()">Previous</button>':'')+(S.ei<n-1?'<button class="primary" onclick="nextEx()">Next movement</button>':'<button class="primary" onclick="finishSession()">Finish session</button>')+'</div>';
+  box.innerHTML=h;
 }
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+function toggleSet(si){ var s=S.ex[S.ei].sets[si]; s.done=!s.done; saveActive(); if(s.done) startRest(90); renderLogger(); }
+function editSet(si){ var s=S.ex[S.ei].sets[si]; var v=prompt('Weight x reps (e.g. 315x4)', s.w+'x'+s.r); if(v){ var m=v.toLowerCase().split('x'); var w=parseInt(m[0],10), r=parseInt(m[1],10); if(!isNaN(w))s.w=w; if(!isNaN(r))s.r=r; saveActive(); renderLogger(); } }
+function addSet(){ var a=S.ex[S.ei].sets, l=a[a.length-1]||{w:0,r:0}; a.push({w:l.w,r:l.r,done:false}); saveActive(); renderLogger(); }
+function prevEx(){ if(S.ei>0){S.ei--;rest=0;saveActive();renderLogger();} }
+function nextEx(){ if(S.ei<S.ex.length-1){S.ei++;rest=0;saveActive();renderLogger();} }
+
+function finishSession(){
+  S.done=true; var vol=0, sets=0;
+  S.ex.forEach(function(e){ e.sets.forEach(function(s){ if(s.done){vol+=s.w*s.r;sets++;} }); });
+  S.vol=vol; S.sets=sets; S.dur=Math.floor((Date.now()-S.startedAt)/1000);
+  var st=loadState(), t=todayStr(); st.history=st.history||[]; st.history.push({date:t,vol:vol,sets:sets});
+  if(st.lastLogged!==t){ st.streak=(st.streak?st.streak+1:24); st.week=(st.week?st.week+1:5); }
+  st.lastLogged=t; saveState(st); clearActive(); clearInterval(restTimer); renderLogger(); refreshToday();
 }
+function renderSummary(){
+  var box=document.getElementById('logger'); if(!box||!S) return;
+  var mins=Math.max(1,Math.round(S.dur/60)), h='<div style="padding-top:6px">';
+  h+='<p class="lab" style="color:var(--amber);margin-top:8px">Session complete</p><h1 class="title" style="margin-top:8px">'+SESSION.name+'</h1>';
+  h+='<p class="mut" style="margin-top:8px;font-size:13px">Logged for today — nice work.</p>';
+  h+='<div style="display:flex;gap:10px;margin-top:24px">';
+  h+='<div class="metric sum-stat" style="flex:1"><p class="v n">'+(S.vol/1000).toFixed(1)+'k</p><p class="lab mut2" style="margin-top:4px">Volume lb</p></div>';
+  h+='<div class="metric sum-stat" style="flex:1"><p class="v n">'+S.sets+'</p><p class="lab mut2" style="margin-top:4px">Sets</p></div>';
+  h+='<div class="metric sum-stat" style="flex:1"><p class="v n">'+mins+'</p><p class="lab mut2" style="margin-top:4px">Minutes</p></div></div>';
+  h+='<div class="exnav" style="margin-top:24px"><button class="primary" onclick="endToToday()">Done</button></div></div>';
+  box.innerHTML=h;
+}
+function endToToday(){ S=null; clearInterval(clockTimer); go('today'); refreshToday(); }
+
+function refreshToday(){
+  var st=loadState();
+  var a=document.getElementById('todayStreak'); if(a) a.textContent=st.streak||23;
+  var b=document.getElementById('todayWeek'); if(b) b.textContent=st.week||4;
+  var bars=document.getElementById('todayBars'); if(bars){ var n=Math.min(5,st.week||4); bars.querySelectorAll('span').forEach(function(sp,i){ sp.className=i<n?'on':''; }); }
+}
+
+S=loadActive();
+refreshToday();
+if(S && !S.done){ var rb=document.querySelector('.cta button'); if(rb) rb.innerHTML='<i class="ti ti-player-play"></i>Resume session'; }
+if('serviceWorker' in navigator){ window.addEventListener('load',function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); }); }
 </script>
 </body>
 </html>
