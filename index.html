@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#060504">
+<title>Meridian</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Meridian">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<style>
+:root{
+  --ink:#060504; --bone:#F5F2EC; --amber:#E89A3C; --amber-deep:#C2541A;
+  --green:#8BC34A; --rust:#E5743A; --glass:rgba(28,22,14,.42);
+  --line:rgba(255,255,255,.10); --mut:rgba(245,242,236,.6); --mut2:rgba(245,242,236,.42);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:#000;font-family:'Inter',-apple-system,sans-serif;color:var(--bone)}
+body{display:flex;justify-content:center;min-height:100dvh}
+.app{position:relative;width:100%;max-width:440px;background:var(--ink);min-height:100dvh;overflow:hidden;display:flex;flex-direction:column}
+.n{font-variant-numeric:tabular-nums}
+.lab{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+.mut{color:var(--mut)} .mut2{color:var(--mut2)}
+
+.glow{position:absolute;top:0;left:0;right:0;height:480px;pointer-events:none;background-size:cover;background-position:center 20%;
+  background-image:radial-gradient(125% 95% at 72% -10%,rgba(217,138,43,.62) 0%,rgba(154,88,22,.42) 24%,rgba(60,34,8,.6) 50%,rgba(10,7,5,.93) 76%),url('images/hero.jpg')}
+.glow2{position:absolute;top:0;left:0;right:0;height:440px;pointer-events:none;
+  background:linear-gradient(180deg,rgba(6,5,4,0) 55%,var(--ink) 100%)}
+
+.statusbar{position:relative;display:flex;justify-content:space-between;align-items:center;
+  padding:max(14px,env(safe-area-inset-top)) 24px 6px;font-size:13px;font-weight:600;z-index:5}
+.statusbar i{font-size:16px}
+
+.screens{position:relative;flex:1;z-index:2}
+.screen{display:none;padding:0 20px 12px;animation:fade .35s ease}
+.screen.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.toprow{display:flex;align-items:center;gap:11px;margin-top:8px}
+.icb{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;
+  align-items:center;justify-content:center;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.14);
+  font-weight:700;font-size:15px;cursor:pointer}
+.icb i{font-size:19px}
+.pill{margin-left:auto;border:1px solid rgba(255,255,255,.4);border-radius:30px;padding:9px 15px;
+  font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+
+.cards{display:flex;gap:12px;margin-top:18px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.cards::-webkit-scrollbar{display:none}
+.glass{flex:0 0 84%;background:var(--glass);backdrop-filter:blur(18px);border:1px solid var(--line);
+  border-radius:18px;padding:15px 17px}
+.bars{display:flex;gap:5px;margin:14px 0 11px}
+.bars span{height:3px;flex:1;border-radius:3px;background:rgba(255,255,255,.22)}
+.bars span.on{background:var(--green)}
+
+.hl{font-weight:800;letter-spacing:-.025em;line-height:1.04;color:#fff;font-size:clamp(32px,9vw,40px);margin-top:30px}
+
+.deck{display:flex;gap:14px;margin-top:32px}
+.vlab{writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:.22em;font-size:11px;padding-top:4px}
+.tile{border-radius:14px;height:178px;position:relative;overflow:hidden;background-size:cover;background-position:center}
+.tile .tlab{position:absolute;top:13px;left:14px;font-size:11px;color:rgba(255,255,255,.88)}
+.t-session{background-color:#5A2208;background-image:linear-gradient(160deg,rgba(240,137,42,.42) 0%,rgba(194,84,26,.35) 45%,rgba(30,10,2,.72) 100%),url('images/session.jpg')}
+.t-detail{background-color:#16242F;background-image:linear-gradient(165deg,rgba(20,12,4,.28) 0%,rgba(11,14,18,.72) 100%),url('images/detail.jpg')}
+.cap{font-weight:700;font-size:16px;margin:11px 0 0;letter-spacing:-.01em;line-height:1.2}
+.cap-sub{margin:5px 0 0;font-size:13px;font-weight:500}
+
+.stats{display:flex;gap:6px;margin-top:22px}
+.stats>div{flex:1}
+.stats .v{font-size:22px;font-weight:800}
+.cta{display:flex;justify-content:center;margin:22px 0 4px}
+.cta button{background:#fff;color:#0A0705;border:none;border-radius:30px;display:flex;align-items:center;
+  gap:10px;padding:15px 32px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;
+  box-shadow:0 8px 22px rgba(0,0,0,.4)}
+.cta button i{font-size:18px}
+
+h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
+.hero{height:320px;border-radius:20px;margin-top:16px;position:relative;overflow:hidden;background-size:cover;background-position:center;
+  background-color:#3a1c08;background-image:linear-gradient(180deg,rgba(6,5,4,.05) 30%,rgba(6,5,4,.85) 100%),url('images/hero.jpg')}
+.hero .meta{position:absolute;left:18px;right:18px;bottom:18px}
+
+.setrow{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.setrow .w{font-size:15px}
+.badge{font-size:11px;font-weight:700;letter-spacing:.14em;color:#0B0A09;background:var(--amber);padding:2px 7px;border-radius:3px}
+.setcur{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border:1px solid rgba(232,154,60,.5);border-radius:10px;margin-top:11px}
+.rest{display:flex;align-items:center;justify-content:space-between;margin-top:16px}
+.timer{font-size:15px;font-weight:600;color:var(--amber)}
+.btn-full{width:100%;margin-top:16px;background:var(--amber);color:#0B0A09;border:none;border-radius:12px;
+  padding:15px;font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;font-family:inherit;cursor:pointer}
+
+.prow{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid rgba(255,255,255,.07)}
+.prow:first-of-type{border-top:none}
+.metric{background:rgba(255,255,255,.05);border-radius:14px;padding:14px 16px}
+
+.nav{position:sticky;bottom:0;display:flex;justify-content:space-between;align-items:center;
+  padding:11px 22px calc(11px + env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,.08);
+  background:rgba(6,5,4,.92);backdrop-filter:blur(12px);z-index:6}
+.nav button{background:none;border:none;color:var(--mut2);font-family:inherit;display:flex;flex-direction:column;
+  align-items:center;gap:5px;font-size:11px;font-weight:500;cursor:pointer}
+.nav button i{font-size:23px}
+.nav button.active{color:#fff}
+.section-lab{margin:24px 0 12px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="glow" id="glow"></div>
+  <div class="glow2" id="glow2"></div>
+
+  <div class="statusbar">
+    <span class="n">9:41</span>
+    <span style="display:flex;gap:7px;align-items:center"><i class="ti ti-antenna-bars-5"></i><i class="ti ti-wifi"></i><i class="ti ti-battery-4" style="font-size:18px"></i></span>
+  </div>
+
+  <div class="screens">
+
+    <!-- TODAY -->
+    <section class="screen active" data-screen="today">
+      <div class="toprow">
+        <div class="icb">R</div>
+        <div class="icb"><i class="ti ti-search"></i></div>
+        <div class="icb"><i class="ti ti-bell"></i></div>
+        <div class="pill">Recomp · Wk 3</div>
+      </div>
+
+      <div class="cards">
+        <div class="glass">
+          <div style="display:flex;justify-content:space-between;align-items:center"><span class="lab mut">This week</span><span style="font-size:13px;font-weight:600">Week 3</span></div>
+          <div class="bars"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span></span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span class="n" style="font-size:14px;font-weight:500;color:rgba(245,242,236,.82)">4 / 5 sessions</span>
+            <span class="n" style="font-size:14px;font-weight:600;color:var(--green)">48.2k lb</span>
+          </div>
+        </div>
+        <div class="glass">
+          <span class="lab mut">Bodyweight</span>
+          <p class="n" style="font-size:22px;font-weight:700;margin:12px 0 2px">198.4</p>
+          <span class="n" style="font-size:13px;font-weight:500;color:var(--green)">&minus;1.2 lb · 14d</span>
+        </div>
+      </div>
+
+      <p class="hl">Progress is power, Ryan. Let's lock in.</p>
+
+      <div class="deck">
+        <div class="vlab lab mut">On deck</div>
+        <div style="flex:1">
+          <div class="tile t-session"><span class="tlab lab">Today · Push</span></div>
+          <p class="cap">Chest &amp; Triceps</p>
+          <p class="cap-sub"><span style="color:var(--rust)">Smith bench 340</span><span class="mut"> · 7 moves</span></p>
+        </div>
+        <div style="flex:1;padding-top:42px">
+          <div class="tile t-detail" style="height:166px"><span class="tlab lab">This block</span>
+            <svg viewBox="0 0 100 60" preserveAspectRatio="none" style="position:absolute;left:10%;right:10%;bottom:16px;width:80%"><polyline points="4,46 34,42 64,28 96,8" fill="none" stroke="#8BC34A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="96" cy="8" r="4" fill="#8BC34A"/></svg>
+          </div>
+          <p class="cap">Barbell Row</p>
+          <p class="cap-sub"><span style="color:#9FD46A">+30 lb</span><span class="mut"> · plateau broken</span></p>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div><p class="v n">8<span style="color:var(--mut2);font-size:13px">/7</span></p><p class="lab mut2" style="margin-top:3px">Sessions</p></div>
+        <div><p class="v n">23</p><p class="lab mut2" style="margin-top:3px">Streak</p></div>
+        <div><p class="v n">12.4<span style="color:var(--mut2);font-size:13px">%</span></p><p class="lab mut2" style="margin-top:3px">Body fat</p></div>
+      </div>
+
+      <div class="cta"><button onclick="go('train')"><i class="ti ti-player-play"></i>Start session</button></div>
+    </section>
+
+    <!-- TRAIN / SESSION -->
+    <section class="screen" data-screen="train">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
+        <span class="lab mut">Chest &amp; Triceps</span>
+        <span style="display:flex;align-items:center;gap:7px;color:var(--amber)"><span style="width:6px;height:6px;border-radius:50%;background:var(--amber)"></span><span class="n" id="sessClock" style="font-size:13px;font-weight:600;letter-spacing:.05em">42:18</span></span>
+      </div>
+      <p class="lab mut" style="margin-top:22px">Movement 03 / 07</p>
+      <h1 class="title">Smith Machine<br>Bench Press</h1>
+      <p class="mut" style="margin-top:8px;font-size:13px">Last session — 315 × 4 · target 340 × 1</p>
+
+      <div style="margin-top:18px">
+        <div class="setrow"><span class="lab mut2" style="letter-spacing:.12em">Set 01</span><span class="w n">315 <span class="mut2">lb</span> × 4</span><i class="ti ti-circle-check" style="font-size:18px;color:var(--green)"></i></div>
+        <div class="setrow"><span style="display:flex;gap:8px;align-items:center"><span class="lab mut2" style="letter-spacing:.12em">Set 02</span><span class="badge">PR</span></span><span class="w n" style="color:var(--amber)">335 lb × 1</span><i class="ti ti-circle-check" style="font-size:18px;color:var(--green)"></i></div>
+        <div class="setcur"><span class="lab" style="color:var(--amber);letter-spacing:.12em">Set 03</span><span class="w n" style="font-size:17px">340 <span class="mut2">lb</span> × 1</span><i class="ti ti-pencil mut2" style="font-size:15px"></i></div>
+      </div>
+
+      <div class="rest"><span class="lab mut" style="display:flex;align-items:center;gap:7px"><i class="ti ti-clock" style="font-size:15px"></i>Rest</span><span class="timer n" id="restClock">1:30</span></div>
+      <button class="btn-full" id="completeBtn" onclick="completeSet()">Complete set</button>
+    </section>
+
+    <!-- PROGRESS -->
+    <section class="screen" data-screen="progress">
+      <p class="lab" style="color:var(--amber);margin-top:14px">Recomp block · Week 3</p>
+      <h1 class="title">Progress</h1>
+
+      <div class="metric" style="margin-top:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span class="lab mut">Barbell Row · top set</span><span class="n" style="font-size:13px;color:var(--amber)">+30 lb</span></div>
+        <svg viewBox="0 0 300 70" preserveAspectRatio="none" style="width:100%;height:70px;margin-top:10px;display:block">
+          <polyline points="8,56 100,52 196,34 292,12" fill="none" stroke="var(--amber)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="292" cy="12" r="4" fill="var(--amber)"/>
+        </svg>
+        <div style="display:flex;justify-content:space-between"><span class="lab mut2">W1 · 215</span><span class="lab" style="color:var(--amber)">W4 · 235</span></div>
+        <p style="margin-top:8px;font-size:13px;color:#9FD46A">Plateau broken — jumped from 225 × 5</p>
+      </div>
+
+      <p class="lab mut section-lab">Recent records</p>
+      <div class="prow"><div><p style="font-size:14px;font-weight:600">Barbell Row</p><p class="mut" style="font-size:12px;margin-top:2px">May 24</p></div><div style="text-align:right"><p class="n" style="font-size:15px;color:var(--amber)">235 × 4</p><p class="lab" style="color:var(--amber);font-size:11px;margin-top:2px">New PR</p></div></div>
+      <div class="prow"><div><p style="font-size:14px;font-weight:600">Smith Bench</p><p class="mut" style="font-size:12px;margin-top:2px">May 23</p></div><p class="n" style="font-size:15px">335 × 1</p></div>
+      <div class="prow"><div><p style="font-size:14px;font-weight:600">Lat Pulldown</p><p class="mut" style="font-size:12px;margin-top:2px">May 24</p></div><p class="n" style="font-size:15px">180 × 8</p></div>
+
+      <p class="lab mut section-lab">Weekly volume</p>
+      <div style="display:flex;align-items:flex-end;gap:8px;height:90px">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:50px;background:rgba(255,255,255,.18);border-radius:5px"></div><span class="lab mut2">W1</span></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:62px;background:rgba(255,255,255,.18);border-radius:5px"></div><span class="lab mut2">W2</span></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:80px;background:var(--amber);border-radius:5px"></div><span class="lab" style="color:var(--amber)">W3</span></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:30px;background:rgba(255,255,255,.1);border-radius:5px"></div><span class="lab mut2">W4</span></div>
+      </div>
+    </section>
+
+    <!-- BODY -->
+    <section class="screen" data-screen="body">
+      <p class="lab" style="color:var(--amber);margin-top:14px">Composition</p>
+      <h1 class="title">Body</h1>
+      <div class="cards" style="margin-top:18px">
+        <div class="glass"><span class="lab mut">Weight</span><p class="n" style="font-size:26px;font-weight:800;margin:12px 0 2px">198.4</p><span class="n" style="font-size:13px;color:var(--green)">&minus;1.2 lb · 14d</span></div>
+        <div class="glass"><span class="lab mut">Body fat</span><p class="n" style="font-size:26px;font-weight:800;margin:12px 0 2px">12.4%</p><span class="n" style="font-size:13px;color:var(--green)">&minus;0.6 · 14d</span></div>
+      </div>
+      <div class="metric" style="margin-top:14px">
+        <span class="lab mut">Bodyweight trend · 14 days</span>
+        <svg viewBox="0 0 300 70" preserveAspectRatio="none" style="width:100%;height:70px;margin-top:10px;display:block">
+          <polyline points="8,14 60,20 120,26 180,30 240,40 292,48" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="292" cy="48" r="4" fill="var(--green)"/>
+        </svg>
+      </div>
+      <p class="mut" style="margin-top:16px;font-size:13px;line-height:1.6">Lean recomp on track — strength climbing while weight trends down. Hold protein, keep the deficit modest.</p>
+    </section>
+
+    <!-- YOU -->
+    <section class="screen" data-screen="you">
+      <div style="display:flex;align-items:center;gap:14px;margin-top:18px">
+        <div class="icb" style="width:60px;height:60px;font-size:22px">R</div>
+        <div><p style="font-size:20px;font-weight:700">Ryan Ebert</p><p class="mut" style="font-size:13px;margin-top:2px">Natural recomp · Block 3</p></div>
+      </div>
+      <p class="lab mut section-lab">This block</p>
+      <div class="prow" style="border-top:none"><span class="mut">Program</span><span>Push / Pull / Legs · 5d</span></div>
+      <div class="prow"><span class="mut">Current PRs</span><span class="n">8 lifts</span></div>
+      <div class="prow"><span class="mut">Day streak</span><span class="n">23</span></div>
+      <div class="prow"><span class="mut">Member since</span><span>May 2026</span></div>
+    </section>
+
+  </div>
+
+  <nav class="nav">
+    <button class="active" data-tab="today" onclick="go('today')"><i class="ti ti-home"></i><span>Today</span></button>
+    <button data-tab="train" onclick="go('train')"><i class="ti ti-barbell"></i><span>Train</span></button>
+    <button data-tab="progress" onclick="go('progress')"><i class="ti ti-chart-line"></i><span>Progress</span></button>
+    <button data-tab="body" onclick="go('body')"><i class="ti ti-flame"></i><span>Body</span></button>
+    <button data-tab="you" onclick="go('you')"><i class="ti ti-user"></i><span>You</span></button>
+  </nav>
+</div>
+
+<script>
+function go(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.dataset.screen===name));
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
+  var warm = (name==='today');
+  document.getElementById('glow').style.opacity = warm?1:0.35;
+  document.getElementById('glow2').style.opacity = warm?1:0.6;
+  window.scrollTo(0,0);
+}
+var rest=90, restTimer=null;
+function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+function completeSet(){
+  var btn=document.getElementById('completeBtn'), clk=document.getElementById('restClock');
+  clearInterval(restTimer); rest=90; clk.textContent=fmt(rest);
+  btn.textContent='Resting…';
+  restTimer=setInterval(function(){
+    rest--; clk.textContent=fmt(rest);
+    if(rest<=0){clearInterval(restTimer); clk.textContent='Ready'; btn.textContent='Complete set';}
+  },1000);
+}
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+}
+</script>
+</body>
+</html>
