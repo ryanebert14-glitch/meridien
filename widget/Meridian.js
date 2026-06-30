@@ -20,7 +20,12 @@ const fallback = {
 };
 
 let d = fallback;
-try { d = Object.assign({}, fallback, await new Request(DATA_URL).loadJSON()); } catch (e) {}
+try {
+  const req = new Request(DATA_URL);
+  req.timeoutInterval = 6;           // fail fast — widgets get only a few seconds
+  const live = await req.loadJSON();
+  if (live && typeof live === "object") d = Object.assign({}, fallback, live);
+} catch (e) { /* offline or slow — render with fallback data */ }
 
 const family = config.widgetFamily || "medium";
 const w = new ListWidget();
