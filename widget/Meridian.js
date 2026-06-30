@@ -3,7 +3,7 @@
 // target lift, recovery, streak and last PR in the Meridian brass-on-black look.
 // Tap the widget to open the full app.
 
-const DATA_URL = "https://ryanebert14-glitch.github.io/meridien/widget-data.json";
+const DATA_URL = "https://ryanebert14glitch--1ced3f0a74d611f1947d1607ee4eb77e.web.val.run";
 const APP_URL  = "https://ryanebert14-glitch.github.io/meridien/";
 
 const BRASS = new Color("#B89B5E");
