@@ -198,22 +198,9 @@ h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
       <div id="progress"></div>
     </section>
 
-    <!-- BODY -->
+    <!-- BODY (rendered by JS from weigh-in history) -->
     <section class="screen" data-screen="body">
-      <p class="lab" style="color:var(--amber);margin-top:14px">Composition</p>
-      <h1 class="title">Body</h1>
-      <div class="cards" style="margin-top:18px">
-        <div class="glass"><span class="lab mut">Weight</span><p class="n" style="font-size:26px;font-weight:800;margin:12px 0 2px">198.4</p><span class="n" style="font-size:13px;color:var(--green)">&minus;1.2 lb · 14d</span></div>
-        <div class="glass"><span class="lab mut">Body fat</span><p class="n" style="font-size:26px;font-weight:800;margin:12px 0 2px">12.4%</p><span class="n" style="font-size:13px;color:var(--green)">&minus;0.6 · 14d</span></div>
-      </div>
-      <div class="metric" style="margin-top:14px">
-        <span class="lab mut">Bodyweight trend · 14 days</span>
-        <svg viewBox="0 0 300 70" preserveAspectRatio="none" style="width:100%;height:70px;margin-top:10px;display:block">
-          <polyline points="8,14 60,20 120,26 180,30 240,40 292,48" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="292" cy="48" r="4" fill="var(--green)"/>
-        </svg>
-      </div>
-      <p class="mut" style="margin-top:16px;font-size:13px;line-height:1.6">Lean recomp on track — strength climbing while weight trends down. Hold protein, keep the deficit modest.</p>
+      <div id="body"></div>
     </section>
 
     <!-- YOU -->
@@ -223,10 +210,11 @@ h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
         <div><p style="font-size:20px;font-weight:700">Ryan Ebert</p><p class="mut" style="font-size:13px;margin-top:2px">Natural recomp · Block 3</p></div>
       </div>
       <p class="lab mut section-lab">This block</p>
-      <div class="prow" style="border-top:none"><span class="mut">Program</span><span>Push / Pull / Legs · 5d</span></div>
-      <div class="prow"><span class="mut">Current PRs</span><span class="n">8 lifts</span></div>
-      <div class="prow"><span class="mut">Day streak</span><span class="n">23</span></div>
+      <div class="prow" style="border-top:none"><span class="mut">Program</span><span>Body-part split · high frequency</span></div>
+      <div class="prow"><span class="mut">Lifts tracked</span><span class="n" id="youLifts">0</span></div>
+      <div class="prow"><span class="mut">Day streak</span><span class="n" id="youStreak">0</span></div>
       <div class="prow"><span class="mut">Member since</span><span>May 2026</span></div>
+      <button class="btn-full" style="margin-top:24px;background:none;border:1px solid rgba(255,255,255,.2);color:var(--mut)" onclick="resetData()">Reset all data</button>
     </section>
 
   </div>
@@ -249,6 +237,7 @@ function go(name){
   document.getElementById('glow2').style.opacity=warm?1:0.6;
   if(name==='train'){ if(S) startClock(); renderLogger(); }
   if(name==='progress'){ renderProgress(); }
+  if(name==='body'){ renderBody(); }
   window.scrollTo(0,0);
 }
 
@@ -323,6 +312,52 @@ function saveActive(){ if(S) localStorage.setItem('meridian_active',JSON.stringi
 function clearActive(){ localStorage.removeItem('meridian_active'); }
 function loadLifts(){ try{return JSON.parse(localStorage.getItem('meridian_lifts'))||{}}catch(e){return {}} }
 function saveLifts(l){ localStorage.setItem('meridian_lifts',JSON.stringify(l)); }
+function loadBody(){ try{return JSON.parse(localStorage.getItem('meridian_body'))||[]}catch(e){return []} }
+function saveBody(b){ localStorage.setItem('meridian_body',JSON.stringify(b)); }
+function logWeigh(){
+  var b=loadBody(), prev=b[b.length-1]||{};
+  var w=prompt('Bodyweight (lb)', prev.weight||186.6); if(!w) return; w=parseFloat(w); if(isNaN(w)) return;
+  var bf=prompt('Body fat % (optional, leave blank to skip)', prev.bf||''); bf=bf?parseFloat(bf):null;
+  b.push({ date:todayStr(), weight:w, bf:(bf!=null&&!isNaN(bf))?bf:null }); saveBody(b);
+  renderBody(); pushWidget();
+}
+function renderBody(){
+  var box=document.getElementById('body'); if(!box) return;
+  var b=loadBody();
+  var h='<p class="lab" style="color:var(--amber);margin-top:14px">Composition</p><h1 class="title" style="margin-top:8px">Body</h1>';
+  if(!b.length){
+    h+='<div style="padding:50px 0;text-align:center"><p class="mut" style="font-size:14px;line-height:1.6">No weigh-ins yet.</p><button class="btn-full" style="margin-top:22px" onclick="logWeigh()">Log weigh-in</button></div>';
+    box.innerHTML=h; return;
+  }
+  var last=b[b.length-1], first=b[0], wch=+(last.weight-first.weight).toFixed(1);
+  var bfE=b.filter(function(x){return x.bf!=null}), lastBf=bfE.length?bfE[bfE.length-1].bf:null;
+  h+='<div class="cards" style="margin-top:18px">';
+  h+='<div class="glass"><span class="lab mut">Weight</span><p class="n" style="font-size:26px;font-weight:800;margin:12px 0 2px">'+last.weight+'</p><span class="n" style="font-size:13px;color:'+(wch<=0?'var(--green)':'#E5743A')+'">'+(wch>0?'+':'')+wch+' lb</span></div>';
+  if(lastBf!=null){ var togo=+(lastBf-12).toFixed(1); h+='<div class="glass"><span class="lab mut">Body fat</span><p class="n" style="font-size:26px;font-weight:800;margin:12px 0 2px">'+lastBf+'%</p><span class="n" style="font-size:13px;color:var(--green)">'+(togo>0?togo+'% to 12% goal':'goal hit')+'</span></div>'; }
+  h+='</div>';
+  if(b.length>=2){
+    var ws=b.map(function(x){return x.weight}), mx=Math.max.apply(null,ws), mn=Math.min.apply(null,ws), rng=(mx-mn)||1, W=300,H=70,p=6;
+    var pts=ws.map(function(v,i){ var x=p+(W-2*p)*(i/(ws.length-1)); var y=H-p-(H-2*p)*((v-mn)/rng); return x.toFixed(0)+','+y.toFixed(0); }).join(' ');
+    h+='<div class="metric" style="margin-top:14px"><span class="lab mut">Weight trend · '+b.length+' weigh-ins</span><svg viewBox="0 0 300 70" preserveAspectRatio="none" style="width:100%;height:70px;margin-top:10px;display:block"><polyline points="'+pts+'" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+  }
+  h+='<p class="lab mut section-lab">Recent weigh-ins</p>';
+  b.slice(-6).reverse().forEach(function(x){ h+='<div class="prow"><span class="mut">'+fmtDate(x.date)+'</span><span class="n">'+x.weight+' lb'+(x.bf!=null?' · '+x.bf+'%':'')+'</span></div>'; });
+  h+='<button class="btn-full" style="margin-top:20px" onclick="logWeigh()">Log weigh-in</button>';
+  box.innerHTML=h;
+}
+function resetData(){
+  if(confirm('Reset all Meridian data? This clears logged sessions and weigh-ins, then restores your baselines.')){
+    ['meridian_state','meridian_active','meridian_lifts','meridian_body','meridian_seed'].forEach(function(k){ localStorage.removeItem(k); });
+    location.reload();
+  }
+}
+function seedBaselines(){
+  if(localStorage.getItem('meridian_seed')) return;
+  var l=loadLifts();
+  if(!Object.keys(l).length){ DAY_ORDER.forEach(function(k){ PROGRAM[k].ex.forEach(function(e){ l[e.n]=e.sets.map(function(s){return {w:s.w,r:s.r}}); }); }); saveLifts(l); }
+  if(!loadBody().length){ saveBody([{date:"2026-5-26",weight:186.6,bf:15.3}]); }
+  localStorage.setItem('meridian_seed','1');
+}
 
 var VAL_URL = "https://ryanebert14glitch--1ced3f0a74d611f1947d1607ee4eb77e.web.val.run";
 function pushWidget(){
@@ -333,7 +368,7 @@ function pushWidget(){
       session: st.lastSessionName || "Ready to train",
       target: (s.weekVol>0 ? kfmt(s.weekVol)+" lb this week" : "Recomp block"), moves: 0, recovery: 86,
       streak: s.streak, weekSessions: s.weekSessions + "/5",
-      bodyweight: 186.6, lastPR: st.lastSession || "—",
+      bodyweight: (loadBody().slice(-1)[0]||{weight:186.6}).weight, lastPR: st.lastSession || "—",
       lastSession: st.lastSession || "—"
     };
     fetch(VAL_URL, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload), keepalive:true }).catch(function(){});
@@ -435,32 +470,37 @@ function refreshToday(){
   var bars=document.getElementById('todayBars'); if(bars){ var n=Math.min(5,s.weekSessions); bars.querySelectorAll('span').forEach(function(sp,i){ sp.className=i<n?'on':''; }); }
   var dn=document.getElementById('deckName'), ds=document.getElementById('deckSub');
   if(dn&&ds){ if(st.lastSessionName){ dn.textContent=st.lastSessionName; ds.innerHTML='<span style="color:#9FD46A">'+(st.lastSession||'')+'</span>'; } else { dn.textContent='No sessions yet'; ds.innerHTML='<span class="mut">Tap Start to log one</span>'; } }
+  var yl=document.getElementById('youLifts'); if(yl) yl.textContent=Object.keys(loadLifts()).length;
+  var ys=document.getElementById('youStreak'); if(ys) ys.textContent=s.streak;
 }
 
 function renderProgress(){
   var box=document.getElementById('progress'); if(!box) return;
-  var hist=((loadState().history)||[]).slice(), s=computeStats();
+  var hist=((loadState().history)||[]).slice(), s=computeStats(), lifts=loadLifts(), names=Object.keys(lifts);
   var h='<p class="lab" style="color:var(--amber);margin-top:14px">Your training</p><h1 class="title" style="margin-top:8px">Progress</h1>';
-  if(!hist.length){
+  if(!hist.length && !names.length){
     h+='<div style="padding:50px 0;text-align:center"><p class="mut" style="font-size:14px;line-height:1.6">No sessions logged yet.<br>Finish a workout and it lands here.</p><div class="cta" style="margin-top:22px"><button onclick="startSession()"><i class="ti ti-player-play"></i>Start a session</button></div></div>';
     box.innerHTML=h; return;
   }
-  h+='<div style="display:flex;gap:10px;margin-top:18px">';
-  h+='<div class="metric sum-stat" style="flex:1"><p class="v n">'+s.sessions+'</p><p class="lab mut2" style="margin-top:4px">Sessions</p></div>';
-  h+='<div class="metric sum-stat" style="flex:1"><p class="v n">'+kfmt(s.totalVol)+'</p><p class="lab mut2" style="margin-top:4px">Total lb</p></div>';
-  h+='<div class="metric sum-stat" style="flex:1"><p class="v n">'+s.streak+'</p><p class="lab mut2" style="margin-top:4px">Streak</p></div></div>';
-  var recent=hist.slice(-8), vols=recent.map(function(x){return x.vol||0});
-  if(recent.length>=2){
-    var mx=Math.max.apply(null,vols), mn=Math.min.apply(null,vols), rng=(mx-mn)||1, W=300, H=70, p=6;
-    var pts=vols.map(function(v,i){ var x=p+(W-2*p)*(i/(vols.length-1)); var y=H-p-(H-2*p)*((v-mn)/rng); return x.toFixed(0)+','+y.toFixed(0); }).join(' ');
-    h+='<p class="lab mut section-lab">Volume · last '+recent.length+' sessions</p>';
-    h+='<div class="metric"><svg viewBox="0 0 300 70" preserveAspectRatio="none" style="width:100%;height:70px;display:block"><polyline points="'+pts+'" fill="none" stroke="var(--amber)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+  if(hist.length){
+    h+='<div style="display:flex;gap:10px;margin-top:18px">';
+    h+='<div class="metric sum-stat" style="flex:1"><p class="v n">'+s.sessions+'</p><p class="lab mut2" style="margin-top:4px">Sessions</p></div>';
+    h+='<div class="metric sum-stat" style="flex:1"><p class="v n">'+kfmt(s.totalVol)+'</p><p class="lab mut2" style="margin-top:4px">Total lb</p></div>';
+    h+='<div class="metric sum-stat" style="flex:1"><p class="v n">'+s.streak+'</p><p class="lab mut2" style="margin-top:4px">Streak</p></div></div>';
+    var recent=hist.slice(-8), vols=recent.map(function(x){return x.vol||0});
+    if(recent.length>=2){
+      var mx=Math.max.apply(null,vols), mn=Math.min.apply(null,vols), rng=(mx-mn)||1, W=300, H=70, p=6;
+      var pts=vols.map(function(v,i){ var x=p+(W-2*p)*(i/(vols.length-1)); var y=H-p-(H-2*p)*((v-mn)/rng); return x.toFixed(0)+','+y.toFixed(0); }).join(' ');
+      h+='<p class="lab mut section-lab">Volume · last '+recent.length+' sessions</p>';
+      h+='<div class="metric"><svg viewBox="0 0 300 70" preserveAspectRatio="none" style="width:100%;height:70px;display:block"><polyline points="'+pts+'" fill="none" stroke="var(--amber)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+    }
+    h+='<p class="lab mut section-lab">Recent sessions</p>';
+    hist.slice(-6).reverse().forEach(function(x){
+      h+='<div class="prow"><div><p style="font-size:14px;font-weight:600">'+(x.name||'Session')+'</p><p class="mut" style="font-size:12px;margin-top:2px">'+fmtDate(x.date)+'</p></div><div style="text-align:right"><p class="n" style="font-size:14px">'+kfmt(x.vol||0)+' lb</p><p class="mut" style="font-size:12px;margin-top:2px">'+(x.sets||0)+' sets</p></div></div>';
+    });
+  } else {
+    h+='<p class="mut" style="margin-top:16px;font-size:13px;line-height:1.6">Baselines set from your log. Finish a workout to start your volume trend.</p>';
   }
-  h+='<p class="lab mut section-lab">Recent sessions</p>';
-  hist.slice(-6).reverse().forEach(function(x){
-    h+='<div class="prow"><div><p style="font-size:14px;font-weight:600">'+(x.name||'Session')+'</p><p class="mut" style="font-size:12px;margin-top:2px">'+fmtDate(x.date)+'</p></div><div style="text-align:right"><p class="n" style="font-size:14px">'+kfmt(x.vol||0)+' lb</p><p class="mut" style="font-size:12px;margin-top:2px">'+(x.sets||0)+' sets</p></div></div>';
-  });
-  var lifts=loadLifts(), names=Object.keys(lifts);
   if(names.length){
     h+='<p class="lab mut section-lab">Current lifts</p>';
     names.map(function(n){ var top=lifts[n].reduce(function(a,b){return (b.w>a.w?b:a)},{w:-1,r:0}); return {n:n,w:top.w,r:top.r}; })
@@ -470,6 +510,7 @@ function renderProgress(){
   box.innerHTML=h;
 }
 
+seedBaselines();
 S=loadActive();
 refreshToday();
 if(loadState().lastLogged) pushWidget();
