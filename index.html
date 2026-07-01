@@ -344,6 +344,8 @@ function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+
 function loadActive(){ try{return JSON.parse(localStorage.getItem('meridian_active'))}catch(e){return null} }
 function saveActive(){ if(S) localStorage.setItem('meridian_active',JSON.stringify(S)); }
 function clearActive(){ localStorage.removeItem('meridian_active'); }
+function loadLifts(){ try{return JSON.parse(localStorage.getItem('meridian_lifts'))||{}}catch(e){return {}} }
+function saveLifts(l){ localStorage.setItem('meridian_lifts',JSON.stringify(l)); }
 
 var VAL_URL = "https://ryanebert14glitch--1ced3f0a74d611f1947d1607ee4eb77e.web.val.run";
 function pushWidget(){
@@ -360,8 +362,14 @@ function pushWidget(){
     fetch(VAL_URL, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload), keepalive:true }).catch(function(){});
   } catch(e){}
 }
-function newSession(key){ var t=PROGRAM[key]; return { key:key, name:t.name, startedAt:Date.now(), ei:0, done:false,
-  ex:t.ex.map(function(e){return {n:e.n,note:e.note,sets:e.sets.map(function(s){return {w:s.w,r:s.r,done:false}})}}) }; }
+function newSession(key){ var t=PROGRAM[key], lifts=loadLifts();
+  return { key:key, name:t.name, startedAt:Date.now(), ei:0, done:false,
+    ex:t.ex.map(function(e){
+      var prev=lifts[e.n], hasPrev=prev&&prev.length;
+      var sets=(hasPrev?prev:e.sets).map(function(s){return {w:s.w,r:s.r,done:false}});
+      var note=hasPrev ? ("Last · "+prev.slice(0,3).map(function(s){return (s.w>0?s.w:'BW')+'×'+s.r}).join(' / ')) : e.note;
+      return { n:e.n, note:note, sets:sets };
+    }) }; }
 
 function startSession(){ S=loadActive()||null; go('train'); if(S&&!S.done) startClock(); renderLogger(); }
 function beginSession(key){ S=newSession(key); saveActive(); go('train'); startClock(); renderLogger(); }
@@ -404,6 +412,9 @@ function finishSession(){
   S.done=true; var vol=0, sets=0;
   S.ex.forEach(function(e){ e.sets.forEach(function(s){ if(s.done){vol+=s.w*s.r;sets++;} }); });
   S.vol=vol; S.sets=sets; S.dur=Math.floor((Date.now()-S.startedAt)/1000);
+  var lifts=loadLifts();
+  S.ex.forEach(function(e){ lifts[e.n]=e.sets.map(function(s){return {w:s.w,r:s.r}}); });
+  saveLifts(lifts);
   var st=loadState(), t=todayStr(); st.history=st.history||[]; st.history.push({date:t,vol:vol,sets:sets});
   if(st.lastLogged!==t){ st.streak=(st.streak?st.streak+1:24); st.week=(st.week?st.week+1:5); }
   st.lastSessionName = S.name;
