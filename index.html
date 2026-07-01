@@ -326,6 +326,10 @@ function fetchHealth(){
   fetch(VAL_URL, {cache:"no-store"}).then(function(r){return r.json()}).then(function(d){
     if(!d||typeof d!=="object") return;
     var he={}; ["weight","bodyfat","hrv","rhr","sleep","steps","activeEnergy","healthDate"].forEach(function(k){ if(d[k]!=null) he[k]=d[k]; });
+    if(he.bodyfat!=null){ if(he.bodyfat<1) he.bodyfat*=100; he.bodyfat=Math.round(he.bodyfat*10)/10; }
+    if(he.weight!=null) he.weight=Math.round(he.weight*10)/10;
+    if(he.sleep!=null) he.sleep=Math.round(he.sleep*10)/10;
+    ["hrv","rhr","steps","activeEnergy"].forEach(function(k){ if(he[k]!=null) he[k]=Math.round(he[k]); });
     localStorage.setItem('meridian_health', JSON.stringify(he));
     refreshToday();
     var bs=document.querySelector('[data-screen="body"]'); if(bs&&bs.classList.contains('active')) renderBody();
