@@ -35,9 +35,7 @@ body{display:flex;justify-content:center;min-height:100dvh}
 .glow2{position:absolute;top:0;left:0;right:0;height:440px;pointer-events:none;
   background:linear-gradient(180deg,rgba(6,5,4,0) 55%,var(--ink) 100%)}
 
-.statusbar{position:relative;display:flex;justify-content:space-between;align-items:center;
-  padding:max(14px,env(safe-area-inset-top)) 24px 6px;font-size:13px;font-weight:600;z-index:5}
-.statusbar i{font-size:16px}
+.topsafe{height:max(16px,env(safe-area-inset-top));position:relative;z-index:5}
 
 .screens{position:relative;flex:1;z-index:2}
 .screen{display:none;padding:0 20px 12px;animation:fade .35s ease}
@@ -51,6 +49,7 @@ body{display:flex;justify-content:center;min-height:100dvh}
 .icb i{font-size:19px}
 .pill{margin-left:auto;border:1px solid rgba(255,255,255,.4);border-radius:30px;padding:9px 15px;
   font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.wordmark{font-size:13px;font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:var(--amber);margin-left:4px}
 
 .cards{display:flex;gap:12px;margin-top:18px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .cards::-webkit-scrollbar{display:none}
@@ -81,14 +80,6 @@ body{display:flex;justify-content:center;min-height:100dvh}
 .cta button i{font-size:18px}
 
 h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
-.hero{height:320px;border-radius:20px;margin-top:16px;position:relative;overflow:hidden;background-size:cover;background-position:center;
-  background-color:#3a1c08;background-image:linear-gradient(180deg,rgba(6,5,4,.05) 30%,rgba(6,5,4,.85) 100%),url('images/hero.jpg')}
-.hero .meta{position:absolute;left:18px;right:18px;bottom:18px}
-
-.setrow{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.07)}
-.setrow .w{font-size:15px}
-.badge{font-size:11px;font-weight:700;letter-spacing:.14em;color:#0B0A09;background:var(--amber);padding:2px 7px;border-radius:3px}
-.setcur{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border:1px solid rgba(232,154,60,.5);border-radius:10px;margin-top:11px}
 .rest{display:flex;align-items:center;justify-content:space-between;margin-top:16px}
 .timer{font-size:15px;font-weight:600;color:var(--amber)}
 .btn-full{width:100%;margin-top:16px;background:var(--amber);color:#0B0A09;border:none;border-radius:12px;
@@ -129,10 +120,7 @@ h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
   <div class="glow" id="glow"></div>
   <div class="glow2" id="glow2"></div>
 
-  <div class="statusbar">
-    <span class="n">9:41</span>
-    <span style="display:flex;gap:7px;align-items:center"><i class="ti ti-antenna-bars-5"></i><i class="ti ti-wifi"></i><i class="ti ti-battery-4" style="font-size:18px"></i></span>
-  </div>
+  <div class="topsafe"></div>
 
   <div class="screens">
 
@@ -140,24 +128,23 @@ h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
     <section class="screen active" data-screen="today">
       <div class="toprow">
         <div class="icb">R</div>
-        <div class="icb"><i class="ti ti-search"></i></div>
-        <div class="icb"><i class="ti ti-bell"></i></div>
-        <div class="pill">Recomp · Wk 3</div>
+        <span class="wordmark">Meridian</span>
+        <div class="pill" id="topPill">Recomp block</div>
       </div>
 
       <div class="cards">
         <div class="glass">
-          <div style="display:flex;justify-content:space-between;align-items:center"><span class="lab mut">This week</span><span style="font-size:13px;font-weight:600">Week 3</span></div>
-          <div class="bars" id="todayBars"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span></span></div>
+          <span class="lab mut">This week</span>
+          <div class="bars" id="todayBars"><span></span><span></span><span></span><span></span><span></span></div>
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <span class="n" style="font-size:14px;font-weight:500;color:rgba(245,242,236,.82)"><span id="todayWeek">4</span> / 5 sessions</span>
+            <span class="n" style="font-size:14px;font-weight:500;color:rgba(245,242,236,.82)"><span id="todayWeek">0</span> / 5 sessions</span>
             <span class="n" id="todayVol" style="font-size:14px;font-weight:600;color:var(--green)">0 lb</span>
           </div>
         </div>
         <div class="glass">
-          <span class="lab mut">Bodyweight</span>
-          <p class="n" style="font-size:22px;font-weight:700;margin:12px 0 2px">198.4</p>
-          <span class="n" style="font-size:13px;font-weight:500;color:var(--green)">&minus;1.2 lb · 14d</span>
+          <span class="lab mut">Day streak</span>
+          <p class="n" id="cardStreak" style="font-size:22px;font-weight:700;margin:12px 0 2px">0</p>
+          <span class="n mut" style="font-size:13px;font-weight:500">consecutive training days</span>
         </div>
       </div>
 
@@ -171,9 +158,7 @@ h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
           <p class="cap-sub"><span style="color:var(--rust)">Pick your workout</span><span class="mut"> · 5 days</span></p>
         </div>
         <div style="flex:1;padding-top:42px">
-          <div class="tile t-detail" style="height:166px"><span class="tlab lab">This block</span>
-            <svg viewBox="0 0 100 60" preserveAspectRatio="none" style="position:absolute;left:10%;right:10%;bottom:16px;width:80%"><polyline points="4,46 34,42 64,28 96,8" fill="none" stroke="#8BC34A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="96" cy="8" r="4" fill="#8BC34A"/></svg>
-          </div>
+          <div class="tile t-detail" style="height:166px"><span class="tlab lab">Recent</span></div>
           <p class="cap" id="deckName">Last session</p>
           <p class="cap-sub" id="deckSub"><span class="mut">Tap Start to log one</span></p>
         </div>
@@ -234,61 +219,61 @@ function go(name){
   window.scrollTo(0,0);
 }
 
-/* ---- Ryan's workout templates (from his real log; weights are starting points) ---- */
+/* ---- Ryan's program: coach-structured (scheme = rep target, cue = coaching note, primary = key lift) ---- */
 var PROGRAM = {
-  "chest-tri": { name:"Chest + Triceps", ex:[
-    {n:"Smith Machine Bench Press", note:"Last 315 × 4 · top 335 × 1", sets:[{w:315,r:4},{w:335,r:1}]},
-    {n:"Incline Press", sets:[{w:225,r:8},{w:205,r:6},{w:225,r:6}]},
-    {n:"Machine Flye", sets:[{w:85,r:12},{w:100,r:12},{w:115,r:12}]},
-    {n:"DB Chest Press", sets:[{w:75,r:12},{w:80,r:10}]},
-    {n:"Triceps Pushdown", sets:[{w:25,r:12},{w:25,r:12},{w:25,r:12}]},
-    {n:"Skull Crusher", sets:[{w:75,r:10}]},
-    {n:"Single-Arm Extension", sets:[{w:25,r:12}]},
-    {n:"Cable Crunch", note:"Abs", sets:[{w:85,r:20}]},
-    {n:"Hanging Knee Raise", note:"Abs", sets:[{w:0,r:10}]}
+  "chest-tri": { name:"Chest + Triceps", focus:"Push · heavy press + triceps", ex:[
+    {n:"Smith Machine Bench Press", primary:true, scheme:"Top set + back-off", cue:"Beat 335 × 1 or add a rep. Leave 1 in the tank.", sets:[{w:315,r:4},{w:335,r:1}]},
+    {n:"Incline Press", scheme:"3 × 6–8", cue:"Full stretch, controlled negative.", sets:[{w:225,r:8},{w:205,r:6},{w:225,r:6}]},
+    {n:"Machine Flye", scheme:"3 × 12–15", cue:"Hold the squeeze one beat.", sets:[{w:85,r:12},{w:100,r:12},{w:115,r:12}]},
+    {n:"DB Chest Press", scheme:"2 × 10–12", cue:"Deep stretch, stop 1 shy of failure.", sets:[{w:75,r:12},{w:80,r:10}]},
+    {n:"Triceps Pushdown", scheme:"3 × 12–15", cue:"Elbows pinned, full lockout.", sets:[{w:25,r:12},{w:25,r:12},{w:25,r:12}]},
+    {n:"Skull Crusher", scheme:"2 × 10–12", cue:"Stretch behind the head.", sets:[{w:75,r:10}]},
+    {n:"Single-Arm Extension", scheme:"2 × 12–15", cue:"Slow eccentric, full range.", sets:[{w:25,r:12}]},
+    {n:"Cable Crunch", scheme:"3 × 15–20", cue:"Round the spine, exhale hard.", sets:[{w:85,r:20}]},
+    {n:"Hanging Knee Raise", scheme:"3 × 10–15", cue:"No swing — control both ways.", sets:[{w:0,r:10}]}
   ]},
-  "back-bi": { name:"Back + Biceps", ex:[
-    {n:"Barbell Row", note:"Last 205 × 5 · top 235 × 4", sets:[{w:205,r:5},{w:235,r:4}]},
-    {n:"Single-Arm Row", sets:[{w:70,r:12},{w:75,r:10},{w:80,r:10}]},
-    {n:"Lat Pulldown", sets:[{w:140,r:12},{w:160,r:10},{w:180,r:8}]},
-    {n:"Cable Row", sets:[{w:140,r:12},{w:160,r:10},{w:180,r:10}]},
-    {n:"Straight-Arm Pulldown", sets:[{w:42.5,r:15},{w:50,r:12},{w:50,r:12}]},
-    {n:"Reverse Pec Deck", sets:[{w:100,r:15},{w:115,r:12},{w:130,r:10}]},
-    {n:"Face Pull", sets:[{w:50,r:15},{w:57.5,r:12},{w:65,r:10}]},
-    {n:"EZ Bar Curl", sets:[{w:75,r:10},{w:75,r:10},{w:75,r:8}]},
-    {n:"Hammer Curl", sets:[{w:45,r:8},{w:35,r:10}]},
-    {n:"Cable Crunch", note:"Abs", sets:[{w:70,r:20}]}
+  "back-bi": { name:"Back + Biceps", focus:"Row strength + width", ex:[
+    {n:"Barbell Row", primary:true, scheme:"Top set + back-off", cue:"Beat 235 × 4. Wrist wraps, dead stop each rep.", sets:[{w:205,r:5},{w:235,r:4}]},
+    {n:"Single-Arm Row", scheme:"3 × 8–12", cue:"Full stretch, drive elbow to hip.", sets:[{w:70,r:12},{w:75,r:10},{w:80,r:10}]},
+    {n:"Lat Pulldown", scheme:"3 × 8–12", cue:"Chest up, pull to collarbone.", sets:[{w:140,r:12},{w:160,r:10},{w:180,r:8}]},
+    {n:"Cable Row", scheme:"3 × 10–12", cue:"Squeeze blades, no torso swing.", sets:[{w:140,r:12},{w:160,r:10},{w:180,r:10}]},
+    {n:"Straight-Arm Pulldown", scheme:"3 × 12–15", cue:"Feel the lats, soft elbows.", sets:[{w:42.5,r:15},{w:50,r:12},{w:50,r:12}]},
+    {n:"Reverse Pec Deck", scheme:"3 × 12–15", cue:"Rear delts, not traps.", sets:[{w:100,r:15},{w:115,r:12},{w:130,r:10}]},
+    {n:"Face Pull", scheme:"3 × 12–15", cue:"Pull to the eyes, rotate out.", sets:[{w:50,r:15},{w:57.5,r:12},{w:65,r:10}]},
+    {n:"EZ Bar Curl", scheme:"3 × 8–10", cue:"No swing — beat 75 soon.", sets:[{w:75,r:10},{w:75,r:10},{w:75,r:8}]},
+    {n:"Hammer Curl", scheme:"2 × 10–12", cue:"Slow, brachialis focus.", sets:[{w:45,r:8},{w:35,r:10}]},
+    {n:"Cable Crunch", scheme:"3 × 15–20", cue:"Crunch the abs, not the hips.", sets:[{w:70,r:20}]}
   ]},
-  "shoulders": { name:"Shoulders + Core", ex:[
-    {n:"Smith Machine OHP", note:"Last top 245 × 5", sets:[{w:185,r:5},{w:225,r:4},{w:245,r:4}]},
-    {n:"Lateral Raise", sets:[{w:20,r:15},{w:25,r:15},{w:30,r:12}]},
-    {n:"Face Pull", sets:[{w:55,r:15},{w:60,r:12},{w:65,r:12}]},
-    {n:"Rear Delt Fly", sets:[{w:50,r:15},{w:60,r:12},{w:70,r:10}]},
-    {n:"Front Raise", sets:[{w:25,r:12},{w:25,r:12},{w:30,r:10}]},
-    {n:"DB Shoulder Press", sets:[{w:70,r:10},{w:85,r:8},{w:100,r:5}]},
-    {n:"Upright Row", sets:[{w:95,r:12},{w:110,r:10}]},
-    {n:"Cable Crunch", note:"Abs", sets:[{w:80,r:20}]},
-    {n:"Hanging Knee Raise", note:"Abs", sets:[{w:0,r:10}]}
+  "shoulders": { name:"Shoulders + Core", focus:"Overhead press + delts", ex:[
+    {n:"Smith Machine OHP", primary:true, scheme:"Top set + back-off", cue:"Beat 245 × 5. Brace hard, no leg drive.", sets:[{w:185,r:5},{w:225,r:4},{w:245,r:4}]},
+    {n:"Lateral Raise", scheme:"3 × 12–15", cue:"Lead with elbows, kill momentum.", sets:[{w:20,r:15},{w:25,r:15},{w:30,r:12}]},
+    {n:"Face Pull", scheme:"3 × 15", cue:"Rear delts + rotator health.", sets:[{w:55,r:15},{w:60,r:12},{w:65,r:12}]},
+    {n:"Rear Delt Fly", scheme:"3 × 12–15", cue:"Squeeze, don't swing.", sets:[{w:50,r:15},{w:60,r:12},{w:70,r:10}]},
+    {n:"Front Raise", scheme:"3 × 10–12", cue:"Controlled, no heaving.", sets:[{w:25,r:12},{w:25,r:12},{w:30,r:10}]},
+    {n:"DB Shoulder Press", scheme:"3 × 5–10", cue:"Deep stretch, press to lockout.", sets:[{w:70,r:10},{w:85,r:8},{w:100,r:5}]},
+    {n:"Upright Row", scheme:"2 × 10–12", cue:"Elbows lead, moderate grip.", sets:[{w:95,r:12},{w:110,r:10}]},
+    {n:"Cable Crunch", scheme:"3 × 15–20", cue:"Full contraction each rep.", sets:[{w:80,r:20}]},
+    {n:"Hanging Knee Raise", scheme:"3 × 10–15", cue:"No swing.", sets:[{w:0,r:10}]}
   ]},
-  "legs": { name:"Legs", ex:[
-    {n:"Leg Press", note:"Last top 500 × 6", sets:[{w:450,r:6},{w:500,r:6}]},
-    {n:"Leg Extension", sets:[{w:110,r:15},{w:120,r:12},{w:130,r:10},{w:145,r:8}]},
-    {n:"Leg Curl", sets:[{w:110,r:15},{w:120,r:12},{w:130,r:10}]},
-    {n:"Smith RDL", sets:[{w:155,r:15},{w:165,r:12},{w:175,r:10}]},
-    {n:"Hack Squat", sets:[{w:125,r:10},{w:125,r:10},{w:125,r:10}]},
-    {n:"Single Leg Press", sets:[{w:100,r:12},{w:110,r:10}]},
-    {n:"Cable Crunch", note:"Abs", sets:[{w:82.5,r:20}]}
+  "legs": { name:"Legs", focus:"Machine leg day + posterior", ex:[
+    {n:"Leg Press", primary:true, scheme:"Top set + back-off", cue:"Beat 500 × 6. Full ROM, controlled.", sets:[{w:450,r:6},{w:500,r:6}]},
+    {n:"Leg Extension", scheme:"4 × 8–15", cue:"Pause and squeeze at the top.", sets:[{w:110,r:15},{w:120,r:12},{w:130,r:10},{w:145,r:8}]},
+    {n:"Leg Curl", scheme:"3 × 10–15", cue:"Control the negative.", sets:[{w:110,r:15},{w:120,r:12},{w:130,r:10}]},
+    {n:"Smith RDL", scheme:"3 × 10–15", cue:"Hips back, feel the hamstrings.", sets:[{w:155,r:15},{w:165,r:12},{w:175,r:10}]},
+    {n:"Hack Squat", scheme:"3 × 10", cue:"Deep, knees track over toes.", sets:[{w:125,r:10},{w:125,r:10},{w:125,r:10}]},
+    {n:"Single Leg Press", scheme:"2 × 10–12", cue:"Even effort each leg.", sets:[{w:100,r:12},{w:110,r:10}]},
+    {n:"Cable Crunch", scheme:"3 × 15–20", cue:"Brace and crunch.", sets:[{w:82.5,r:20}]}
   ]},
-  "arms": { name:"Arms + Abs", ex:[
-    {n:"Smith Close-Grip Bench", note:"Last top 205 × 4", sets:[{w:165,r:6},{w:185,r:6},{w:205,r:4}]},
-    {n:"EZ Bar Curl", sets:[{w:75,r:10},{w:75,r:10},{w:75,r:8}]},
-    {n:"Cable Pushdown", sets:[{w:100,r:12},{w:115,r:10},{w:120,r:8}]},
-    {n:"Smith Skull Crusher", sets:[{w:115,r:10},{w:135,r:8},{w:145,r:5}]},
-    {n:"Overhead Extension", sets:[{w:60,r:12},{w:70,r:10},{w:80,r:8}]},
-    {n:"Hammer Curl", sets:[{w:45,r:12},{w:50,r:10}]},
-    {n:"Weighted Dips", sets:[{w:35,r:10},{w:35,r:10}]},
-    {n:"Cable Crunch", note:"Abs", sets:[{w:85,r:20}]},
-    {n:"Ab Wheel", note:"Abs", sets:[{w:0,r:10}]}
+  "arms": { name:"Arms + Abs", focus:"Direct arm volume", ex:[
+    {n:"Smith Close-Grip Bench", primary:true, scheme:"Top set + back-off", cue:"Beat 205 × 4. Elbows tucked.", sets:[{w:165,r:6},{w:185,r:6},{w:205,r:4}]},
+    {n:"EZ Bar Curl", scheme:"3 × 8–10", cue:"No swing, full squeeze.", sets:[{w:75,r:10},{w:75,r:10},{w:75,r:8}]},
+    {n:"Cable Pushdown", scheme:"3 × 10–12", cue:"Lock out, elbows pinned.", sets:[{w:100,r:12},{w:115,r:10},{w:120,r:8}]},
+    {n:"Smith Skull Crusher", scheme:"3 × 6–10", cue:"Stretch, then drive.", sets:[{w:115,r:10},{w:135,r:8},{w:145,r:5}]},
+    {n:"Overhead Extension", scheme:"3 × 10–12", cue:"Full stretch overhead.", sets:[{w:60,r:12},{w:70,r:10},{w:80,r:8}]},
+    {n:"Hammer Curl", scheme:"2 × 10–12", cue:"Brachialis + forearm.", sets:[{w:45,r:12},{w:50,r:10}]},
+    {n:"Weighted Dips", scheme:"2 × 8–12", cue:"Lean forward, deep stretch.", sets:[{w:35,r:10},{w:35,r:10}]},
+    {n:"Cable Crunch", scheme:"3 × 15–20", cue:"Exhale hard at the bottom.", sets:[{w:85,r:20}]},
+    {n:"Ab Wheel", scheme:"3 × 8–12", cue:"Brace — don't let the low back sag.", sets:[{w:0,r:10}]}
   ]}
 };
 var DAY_ORDER = ["chest-tri","back-bi","shoulders","legs","arms"];
@@ -337,8 +322,8 @@ function newSession(key){ var t=PROGRAM[key], lifts=loadLifts();
     ex:t.ex.map(function(e){
       var prev=lifts[e.n], hasPrev=prev&&prev.length;
       var sets=(hasPrev?prev:e.sets).map(function(s){return {w:s.w,r:s.r,done:false}});
-      var note=hasPrev ? ("Last · "+prev.slice(0,3).map(function(s){return (s.w>0?s.w:'BW')+'×'+s.r}).join(' / ')) : e.note;
-      return { n:e.n, note:note, sets:sets };
+      var last=hasPrev ? prev.slice(0,3).map(function(s){return (s.w>0?s.w:'BW')+'×'+s.r}).join(' / ') : null;
+      return { n:e.n, scheme:e.scheme, cue:e.cue, primary:!!e.primary, last:last, sets:sets };
     }) }; }
 
 function startSession(){ S=loadActive()||null; go('train'); if(S&&!S.done) startClock(); renderLogger(); }
@@ -347,7 +332,7 @@ function renderPicker(){
   var box=document.getElementById('logger'); if(!box) return;
   var h='<p class="lab mut" style="margin-top:14px">Start a session</p><h1 class="title" style="margin-top:8px">Choose your workout</h1><div style="margin-top:18px">';
   DAY_ORDER.forEach(function(k){ var t=PROGRAM[k];
-    h+='<div class="pickrow" onclick="beginSession(\''+k+'\')"><div><p style="font-size:16px;font-weight:700">'+t.name+'</p><p class="mut" style="font-size:12px;margin-top:3px">'+t.ex.length+' movements</p></div><i class="ti ti-chevron-right" style="font-size:20px;color:var(--mut)"></i></div>';
+    h+='<div class="pickrow" onclick="beginSession(\''+k+'\')"><div><p style="font-size:16px;font-weight:700">'+t.name+'</p><p class="mut" style="font-size:12px;margin-top:3px">'+t.ex.length+' movements'+(t.focus?' · '+t.focus:'')+'</p></div><i class="ti ti-chevron-right" style="font-size:20px;color:var(--mut)"></i></div>';
   });
   h+='</div>'; box.innerHTML=h;
 }
@@ -362,9 +347,11 @@ function renderLogger(){
   var e=S.ex[S.ei], n=S.ex.length, el=fmt(Math.floor((Date.now()-S.startedAt)/1000)), h='';
   h+='<div class="lg-head"><span class="lab mut">'+S.name+'</span><span style="display:flex;align-items:center;gap:7px;color:var(--amber)"><span style="width:6px;height:6px;border-radius:50%;background:var(--amber)"></span><span class="n" id="sessClock" style="font-size:13px;font-weight:600">'+el+'</span></span></div>';
   h+='<div class="lg-prog"><span style="width:'+(S.ei/n*100)+'%"></span></div>';
-  h+='<p class="lab mut" style="margin-top:16px">Movement '+pad(S.ei+1)+' / '+pad(n)+'</p>';
+  h+='<p class="lab mut" style="margin-top:16px">Movement '+pad(S.ei+1)+' / '+pad(n)+(e.primary?' · <span style="color:var(--amber)">Primary lift</span>':'')+'</p>';
   h+='<h1 class="title" style="margin-top:8px">'+e.n+'</h1>';
-  if(e.note) h+='<p class="mut" style="margin-top:8px;font-size:13px">'+e.note+'</p>';
+  var sub=[]; if(e.scheme) sub.push(e.scheme); if(e.last) sub.push('Last '+e.last);
+  if(sub.length) h+='<p class="mut" style="margin-top:8px;font-size:13px">'+sub.join('  ·  ')+'</p>';
+  if(e.cue) h+='<p style="margin-top:11px;font-size:13px;color:var(--amber);display:flex;gap:8px;align-items:flex-start;line-height:1.4"><i class="ti ti-bulb" style="font-size:15px;flex:none;margin-top:1px"></i><span>'+e.cue+'</span></p>';
   h+='<div style="margin-top:16px">';
   e.sets.forEach(function(s,si){ h+='<div class="lset'+(s.done?' done':'')+'"><span class="lab mut2" style="letter-spacing:.12em">Set '+pad(si+1)+'</span><span class="lw n" onclick="editSet('+si+')">'+(s.w>0?(s.w+' <span class="mut2">lb</span> × '+s.r):('<span class="mut2">BW</span> × '+s.r))+'</span><span class="chk'+(s.done?' on':'')+'" onclick="toggleSet('+si+')"><i class="ti ti-check"></i></span></div>'; });
   h+='</div><button class="addset" onclick="addSet()">+ Add set</button>';
@@ -432,6 +419,8 @@ function refreshToday(){
   var tv=document.getElementById('todayTotalVol'); if(tv) tv.textContent=(s.totalVol>0?kfmt(s.totalVol):'0');
   var yl=document.getElementById('youLifts'); if(yl) yl.textContent=Object.keys(loadLifts()).length;
   var ys=document.getElementById('youStreak'); if(ys) ys.textContent=s.streak;
+  var cs=document.getElementById('cardStreak'); if(cs) cs.textContent=s.streak;
+  var tp=document.getElementById('topPill'); if(tp) tp.textContent=(s.streak>0?s.streak+' day streak':'Recomp block');
 }
 
 function renderProgress(){
