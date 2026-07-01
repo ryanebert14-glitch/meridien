@@ -27,6 +27,14 @@ try {
   if (live && typeof live === "object") d = Object.assign({}, fallback, live);
 } catch (e) { /* offline or slow — render with fallback data */ }
 
+function recovery(x) {
+  if (x.hrv == null && x.sleep == null && x.rhr == null) return x.recovery != null ? x.recovery : 86;
+  const hrv = x.hrv || 50, sleep = x.sleep || 7, rhr = x.rhr || 50;
+  const sc = 55 * (Math.min(hrv, 80) / 70) + 30 * (Math.min(sleep, 9) / 8) + 15 * ((60 - Math.min(rhr, 60)) / 14);
+  return Math.max(40, Math.min(99, Math.round(sc)));
+}
+d.recovery = recovery(d);
+
 const family = config.widgetFamily || "medium";
 const w = new ListWidget();
 w.url = APP_URL;
