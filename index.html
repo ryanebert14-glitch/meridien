@@ -180,9 +180,9 @@ h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
       </div>
 
       <div class="stats">
-        <div><p class="v n">8<span style="color:var(--mut2);font-size:13px">/7</span></p><p class="lab mut2" style="margin-top:3px">Sessions</p></div>
-        <div><p class="v n" id="todayStreak">23</p><p class="lab mut2" style="margin-top:3px">Streak</p></div>
-        <div><p class="v n">12.4<span style="color:var(--mut2);font-size:13px">%</span></p><p class="lab mut2" style="margin-top:3px">Body fat</p></div>
+        <div><p class="v n" id="todaySessTotal">0</p><p class="lab mut2" style="margin-top:3px">Sessions</p></div>
+        <div><p class="v n" id="todayStreak">0</p><p class="lab mut2" style="margin-top:3px">Streak</p></div>
+        <div><p class="v n" id="todayTotalVol">0</p><p class="lab mut2" style="margin-top:3px">Total lb</p></div>
       </div>
 
       <div class="cta"><button onclick="startSession()"><i class="ti ti-player-play"></i>Start session</button></div>
@@ -196,11 +196,6 @@ h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
     <!-- PROGRESS (rendered by JS from logged history) -->
     <section class="screen" data-screen="progress">
       <div id="progress"></div>
-    </section>
-
-    <!-- BODY (rendered by JS from weigh-in history) -->
-    <section class="screen" data-screen="body">
-      <div id="body"></div>
     </section>
 
     <!-- YOU -->
@@ -223,7 +218,6 @@ h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
     <button class="active" data-tab="today" onclick="go('today')"><i class="ti ti-home"></i><span>Today</span></button>
     <button data-tab="train" onclick="go('train')"><i class="ti ti-barbell"></i><span>Train</span></button>
     <button data-tab="progress" onclick="go('progress')"><i class="ti ti-chart-line"></i><span>Progress</span></button>
-    <button data-tab="body" onclick="go('body')"><i class="ti ti-flame"></i><span>Body</span></button>
     <button data-tab="you" onclick="go('you')"><i class="ti ti-user"></i><span>You</span></button>
   </nav>
 </div>
@@ -237,7 +231,6 @@ function go(name){
   document.getElementById('glow2').style.opacity=warm?1:0.6;
   if(name==='train'){ if(S) startClock(); renderLogger(); }
   if(name==='progress'){ renderProgress(); }
-  if(name==='body'){ renderBody(); }
   window.scrollTo(0,0);
 }
 
@@ -312,70 +305,9 @@ function saveActive(){ if(S) localStorage.setItem('meridian_active',JSON.stringi
 function clearActive(){ localStorage.removeItem('meridian_active'); }
 function loadLifts(){ try{return JSON.parse(localStorage.getItem('meridian_lifts'))||{}}catch(e){return {}} }
 function saveLifts(l){ localStorage.setItem('meridian_lifts',JSON.stringify(l)); }
-function loadBody(){ try{return JSON.parse(localStorage.getItem('meridian_body'))||[]}catch(e){return []} }
-function saveBody(b){ localStorage.setItem('meridian_body',JSON.stringify(b)); }
-function loadHealth(){ try{return JSON.parse(localStorage.getItem('meridian_health'))||{}}catch(e){return {}} }
-function recoveryScore(){
-  var h=loadHealth();
-  if(h.hrv==null && h.sleep==null && h.rhr==null) return null;
-  var hrv=h.hrv||50, sleep=h.sleep||7, rhr=h.rhr||50;
-  var sc = 55*(Math.min(hrv,80)/70) + 30*(Math.min(sleep,9)/8) + 15*((60-Math.min(rhr,60))/14);
-  return Math.max(40, Math.min(99, Math.round(sc)));
-}
-function fetchHealth(){
-  fetch(VAL_URL, {cache:"no-store"}).then(function(r){return r.json()}).then(function(d){
-    if(!d||typeof d!=="object") return;
-    var he={}; ["weight","bodyfat","hrv","rhr","sleep","steps","activeEnergy","healthDate"].forEach(function(k){ if(d[k]!=null) he[k]=d[k]; });
-    if(he.bodyfat!=null){ if(he.bodyfat<1) he.bodyfat*=100; he.bodyfat=Math.round(he.bodyfat*10)/10; }
-    if(he.weight!=null) he.weight=Math.round(he.weight*10)/10;
-    if(he.sleep!=null) he.sleep=Math.round(he.sleep*10)/10;
-    ["hrv","rhr","steps","activeEnergy"].forEach(function(k){ if(he[k]!=null) he[k]=Math.round(he[k]); });
-    localStorage.setItem('meridian_health', JSON.stringify(he));
-    refreshToday();
-    var bs=document.querySelector('[data-screen="body"]'); if(bs&&bs.classList.contains('active')) renderBody();
-  }).catch(function(){});
-}
-function logWeigh(){
-  var b=loadBody(), prev=b[b.length-1]||{};
-  var w=prompt('Bodyweight (lb)', prev.weight||186.6); if(!w) return; w=parseFloat(w); if(isNaN(w)) return;
-  var bf=prompt('Body fat % (optional, leave blank to skip)', prev.bf||''); bf=bf?parseFloat(bf):null;
-  b.push({ date:todayStr(), weight:w, bf:(bf!=null&&!isNaN(bf))?bf:null }); saveBody(b);
-  renderBody(); pushWidget();
-}
-function renderBody(){
-  var box=document.getElementById('body'); if(!box) return;
-  var b=loadBody(), hh=loadHealth(), rec=recoveryScore(), hasHealth=(hh.weight!=null||hh.hrv!=null||hh.steps!=null||hh.bodyfat!=null);
-  var h='<p class="lab" style="color:var(--amber);margin-top:14px">Composition</p><h1 class="title" style="margin-top:8px">Body</h1>';
-  if(!b.length && !hasHealth){
-    h+='<div style="padding:50px 0;text-align:center"><p class="mut" style="font-size:14px;line-height:1.6">No data yet.<br>Log a weigh-in, or sync Apple Health.</p><button class="btn-full" style="margin-top:22px" onclick="logWeigh()">Log weigh-in</button></div>';
-    box.innerHTML=h; return;
-  }
-  if(hasHealth){
-    h+='<div class="cards" style="margin-top:18px">';
-    if(hh.weight!=null) h+='<div class="glass"><span class="lab mut">Weight</span><p class="n" style="font-size:24px;font-weight:800;margin:12px 0 2px">'+hh.weight+'</p><span class="n mut" style="font-size:12px">lb</span></div>';
-    if(hh.bodyfat!=null){ var tg=+(hh.bodyfat-12).toFixed(1); h+='<div class="glass"><span class="lab mut">Body fat</span><p class="n" style="font-size:24px;font-weight:800;margin:12px 0 2px">'+hh.bodyfat+'%</p><span class="n" style="font-size:12px;color:var(--green)">'+(tg>0?tg+'% to goal':'goal hit')+'</span></div>'; }
-    if(rec!=null) h+='<div class="glass"><span class="lab mut">Recovery</span><p class="n" style="font-size:24px;font-weight:800;margin:12px 0 2px;color:var(--amber)">'+rec+'</p><span class="n mut" style="font-size:12px">readiness</span></div>';
-    h+='</div>';
-    h+='<div style="display:flex;gap:6px;margin-top:12px">';
-    if(hh.sleep!=null) h+='<div class="metric sum-stat" style="flex:1"><p class="n" style="font-size:18px;font-weight:700">'+hh.sleep+'h</p><p class="lab mut2" style="margin-top:3px">Sleep</p></div>';
-    if(hh.rhr!=null) h+='<div class="metric sum-stat" style="flex:1"><p class="n" style="font-size:18px;font-weight:700">'+hh.rhr+'</p><p class="lab mut2" style="margin-top:3px">Rest HR</p></div>';
-    if(hh.steps!=null) h+='<div class="metric sum-stat" style="flex:1"><p class="n" style="font-size:18px;font-weight:700">'+(hh.steps>=1000?(hh.steps/1000).toFixed(1)+'k':hh.steps)+'</p><p class="lab mut2" style="margin-top:3px">Steps</p></div>';
-    if(hh.activeEnergy!=null) h+='<div class="metric sum-stat" style="flex:1"><p class="n" style="font-size:18px;font-weight:700">'+hh.activeEnergy+'</p><p class="lab mut2" style="margin-top:3px">Active</p></div>';
-    h+='</div>';
-    h+='<p class="mut" style="font-size:11px;margin-top:10px">Synced from Apple Health'+(hh.healthDate?(' · '+hh.healthDate):'')+'</p>';
-  }
-  if(b.length>=2){
-    var ws=b.map(function(x){return x.weight}), mx=Math.max.apply(null,ws), mn=Math.min.apply(null,ws), rng=(mx-mn)||1, W=300,H=70,p=6;
-    var pts=ws.map(function(v,i){ var x=p+(W-2*p)*(i/(ws.length-1)); var y=H-p-(H-2*p)*((v-mn)/rng); return x.toFixed(0)+','+y.toFixed(0); }).join(' ');
-    h+='<div class="metric" style="margin-top:14px"><span class="lab mut">Weight trend · '+b.length+' weigh-ins</span><svg viewBox="0 0 300 70" preserveAspectRatio="none" style="width:100%;height:70px;margin-top:10px;display:block"><polyline points="'+pts+'" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
-  }
-  if(b.length){ h+='<p class="lab mut section-lab">Weigh-in log</p>'; b.slice(-6).reverse().forEach(function(x){ h+='<div class="prow"><span class="mut">'+fmtDate(x.date)+'</span><span class="n">'+x.weight+' lb'+(x.bf!=null?' · '+x.bf+'%':'')+'</span></div>'; }); }
-  h+='<button class="btn-full" style="margin-top:20px" onclick="logWeigh()">Log weigh-in</button>';
-  box.innerHTML=h;
-}
 function resetData(){
   if(confirm('Reset all Meridian data? This clears logged sessions and weigh-ins, then restores your baselines.')){
-    ['meridian_state','meridian_active','meridian_lifts','meridian_body','meridian_seed'].forEach(function(k){ localStorage.removeItem(k); });
+    ['meridian_state','meridian_active','meridian_lifts','meridian_body','meridian_health','meridian_seed'].forEach(function(k){ localStorage.removeItem(k); });
     location.reload();
   }
 }
@@ -383,7 +315,6 @@ function seedBaselines(){
   if(localStorage.getItem('meridian_seed')) return;
   var l=loadLifts();
   if(!Object.keys(l).length){ DAY_ORDER.forEach(function(k){ PROGRAM[k].ex.forEach(function(e){ l[e.n]=e.sets.map(function(s){return {w:s.w,r:s.r}}); }); }); saveLifts(l); }
-  if(!loadBody().length){ saveBody([{date:"2026-5-26",weight:186.6,bf:15.3}]); }
   localStorage.setItem('meridian_seed','1');
 }
 
@@ -394,9 +325,8 @@ function pushWidget(){
     var payload = {
       date: new Date().toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' }),
       session: st.lastSessionName || "Ready to train",
-      target: (s.weekVol>0 ? kfmt(s.weekVol)+" lb this week" : "Recomp block"), moves: 0, recovery: (recoveryScore()||86),
+      target: (s.weekVol>0 ? kfmt(s.weekVol)+" lb this week" : "Ready to train"),
       streak: s.streak, weekSessions: s.weekSessions + "/5",
-      bodyweight: (loadHealth().weight!=null ? loadHealth().weight : (loadBody().slice(-1)[0]||{weight:186.6}).weight), lastPR: st.lastSession || "—",
       lastSession: st.lastSession || "—"
     };
     fetch(VAL_URL, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload), keepalive:true }).catch(function(){});
@@ -498,6 +428,8 @@ function refreshToday(){
   var bars=document.getElementById('todayBars'); if(bars){ var n=Math.min(5,s.weekSessions); bars.querySelectorAll('span').forEach(function(sp,i){ sp.className=i<n?'on':''; }); }
   var dn=document.getElementById('deckName'), ds=document.getElementById('deckSub');
   if(dn&&ds){ if(st.lastSessionName){ dn.textContent=st.lastSessionName; ds.innerHTML='<span style="color:#9FD46A">'+(st.lastSession||'')+'</span>'; } else { dn.textContent='No sessions yet'; ds.innerHTML='<span class="mut">Tap Start to log one</span>'; } }
+  var st2=document.getElementById('todaySessTotal'); if(st2) st2.textContent=s.sessions;
+  var tv=document.getElementById('todayTotalVol'); if(tv) tv.textContent=(s.totalVol>0?kfmt(s.totalVol):'0');
   var yl=document.getElementById('youLifts'); if(yl) yl.textContent=Object.keys(loadLifts()).length;
   var ys=document.getElementById('youStreak'); if(ys) ys.textContent=s.streak;
 }
@@ -541,7 +473,6 @@ function renderProgress(){
 seedBaselines();
 S=loadActive();
 refreshToday();
-fetchHealth();
 if(loadState().lastLogged) pushWidget();
 if(S && !S.done){ var rb=document.querySelector('.cta button'); if(rb) rb.innerHTML='<i class="ti ti-player-play"></i>Resume session'; }
 if('serviceWorker' in navigator){ window.addEventListener('load',function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); }); }

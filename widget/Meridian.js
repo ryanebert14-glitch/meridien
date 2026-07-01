@@ -1,10 +1,8 @@
-// Meridian — iOS home-screen widget (Scriptable)
-// Pulls live data from your GitHub Pages app and renders today's session,
-// target lift, recovery, streak and last PR in the Meridian brass-on-black look.
-// Tap the widget to open the full app.
+// Meridian — iOS home-screen widget (Scriptable). Workout-only.
+// Reads live data from the Val Town endpoint; taps open the app.
 
 const DATA_URL = "https://ryanebert14glitch--1ced3f0a74d611f1947d1607ee4eb77e.web.val.run";
-const APP_URL  = "https://ryanebert14-glitch.github.io/meridien/";
+const APP_URL  = "https://ryanebert14glitch--1ced3f0a74d611f1947d1607ee4eb77e.web.val.run";
 
 const BRASS = new Color("#B89B5E");
 const BONE  = new Color("#F5F2EC");
@@ -14,33 +12,28 @@ const MUT   = new Color("#8B857A");
 const INK   = new Color("#0A0908");
 
 const fallback = {
-  date: "Fri May 30", session: "Chest & Triceps", focus: "Push", moves: 7,
-  target: "Smith bench 340", recovery: 86, streak: 23, weekSessions: "4/5",
-  bodyweight: 198.4, lastPR: "Row 235 × 4"
+  date: "Today", session: "Ready to train", target: "Pick your workout",
+  streak: 0, weekSessions: "0/5", lastSession: "—"
 };
 
 let d = fallback;
 try {
   const req = new Request(DATA_URL);
-  req.timeoutInterval = 6;           // fail fast — widgets get only a few seconds
+  req.timeoutInterval = 6;
   const live = await req.loadJSON();
   if (live && typeof live === "object") d = Object.assign({}, fallback, live);
-} catch (e) { /* offline or slow — render with fallback data */ }
+} catch (e) { /* offline — render fallback */ }
 
-function recovery(x) {
-  if (x.hrv == null && x.sleep == null && x.rhr == null) return x.recovery != null ? x.recovery : 86;
-  const hrv = x.hrv || 50, sleep = x.sleep || 7, rhr = x.rhr || 50;
-  const sc = 55 * (Math.min(hrv, 80) / 70) + 30 * (Math.min(sleep, 9) / 8) + 15 * ((60 - Math.min(rhr, 60)) / 14);
-  return Math.max(40, Math.min(99, Math.round(sc)));
+function weekFrac(ws) {
+  const p = String(ws).split("/"); const n = parseFloat(p[0]) || 0, den = parseFloat(p[1]) || 5;
+  return Math.max(0, Math.min(1, n / den));
 }
-d.recovery = recovery(d);
 
 const family = config.widgetFamily || "medium";
 const w = new ListWidget();
-w.url = APP_URL;
+w.url = "https://ryanebert14-glitch.github.io/meridien/";
 w.refreshAfterDate = new Date(Date.now() + 30 * 60 * 1000);
 w.setPadding(15, 17, 15, 17);
-
 const g = new LinearGradient();
 g.colors = [new Color("#3A2208"), INK];
 g.locations = [0, 0.7];
@@ -63,12 +56,12 @@ if (family === "small") {
   w.addSpacer(3);
   let t = w.addText(d.target); t.font = Font.systemFont(11); t.textColor = RUST; t.lineLimit = 1;
   w.addSpacer();
-  let recRow = w.addStack(); recRow.layoutHorizontally(); recRow.bottomAlignContent();
-  let rec = recRow.addText(String(d.recovery)); rec.font = Font.boldSystemFont(26); rec.textColor = BONE;
-  recRow.addSpacer(6);
-  let rl = recRow.addText("RECOVERY"); rl.font = Font.semiboldSystemFont(9); rl.textColor = MUT;
+  let row = w.addStack(); row.layoutHorizontally(); row.bottomAlignContent();
+  let num = row.addText(String(d.streak)); num.font = Font.boldSystemFont(26); num.textColor = BONE;
+  row.addSpacer(6);
+  let dl = row.addText("DAY STREAK"); dl.font = Font.semiboldSystemFont(9); dl.textColor = MUT;
   w.addSpacer(6);
-  w.addImage(meter(d.recovery / 100, 128));
+  w.addImage(meter(weekFrac(d.weekSessions), 128));
 } else {
   const row = w.addStack(); row.layoutHorizontally(); row.topAlignContent();
 
@@ -78,27 +71,21 @@ if (family === "small") {
   left.addSpacer(8);
   let s = left.addText(d.session); s.font = Font.boldSystemFont(22); s.textColor = BONE; s.minimumScaleFactor = 0.8; s.lineLimit = 1;
   left.addSpacer(3);
-  let t = left.addText(d.target + " · " + d.moves + " moves");
-  t.font = Font.systemFont(12); t.textColor = RUST; t.lineLimit = 1;
+  let t = left.addText(d.target); t.font = Font.systemFont(12); t.textColor = RUST; t.lineLimit = 1;
   left.addSpacer();
-  let st = left.addText("Streak " + d.streak + "    •    Week " + d.weekSessions);
-  st.font = Font.systemFont(11); st.textColor = MUT;
+  let ws = left.addText("Week " + d.weekSessions + " sessions"); ws.font = Font.systemFont(11); ws.textColor = MUT;
   left.addSpacer(2);
-  let pr = left.addText("Last PR · " + d.lastPR);
-  pr.font = Font.systemFont(11); pr.textColor = GREEN;
+  let ls = left.addText("Last · " + d.lastSession); ls.font = Font.systemFont(11); ls.textColor = GREEN; ls.lineLimit = 1;
 
   row.addSpacer();
 
   const right = row.addStack(); right.layoutVertically();
-  let rnum = right.addText(String(d.recovery)); rnum.font = Font.boldSystemFont(34); rnum.textColor = BONE; rnum.rightAlignText();
-  let rlab = right.addText("RECOVERY"); rlab.font = Font.semiboldSystemFont(9); rlab.textColor = BRASS; rlab.rightAlignText();
+  let num = right.addText(String(d.streak)); num.font = Font.boldSystemFont(34); num.textColor = BONE; num.rightAlignText();
+  let dl = right.addText("DAY STREAK"); dl.font = Font.semiboldSystemFont(9); dl.textColor = BRASS; dl.rightAlignText();
   right.addSpacer(12);
-  right.addImage(meter(d.recovery / 100, 92));
+  right.addImage(meter(weekFrac(d.weekSessions), 92));
 }
 
-if (config.runsInWidget) {
-  Script.setWidget(w);
-} else {
-  family === "small" ? w.presentSmall() : w.presentMedium();
-}
+if (config.runsInWidget) { Script.setWidget(w); }
+else { family === "small" ? w.presentSmall() : w.presentMedium(); }
 Script.complete();
