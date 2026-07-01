@@ -151,7 +151,7 @@ h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
           <div class="bars" id="todayBars"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span></span></div>
           <div style="display:flex;justify-content:space-between;align-items:center">
             <span class="n" style="font-size:14px;font-weight:500;color:rgba(245,242,236,.82)"><span id="todayWeek">4</span> / 5 sessions</span>
-            <span class="n" style="font-size:14px;font-weight:600;color:var(--green)">48.2k lb</span>
+            <span class="n" id="todayVol" style="font-size:14px;font-weight:600;color:var(--green)">0 lb</span>
           </div>
         </div>
         <div class="glass">
@@ -174,8 +174,8 @@ h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
           <div class="tile t-detail" style="height:166px"><span class="tlab lab">This block</span>
             <svg viewBox="0 0 100 60" preserveAspectRatio="none" style="position:absolute;left:10%;right:10%;bottom:16px;width:80%"><polyline points="4,46 34,42 64,28 96,8" fill="none" stroke="#8BC34A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="96" cy="8" r="4" fill="#8BC34A"/></svg>
           </div>
-          <p class="cap">Barbell Row</p>
-          <p class="cap-sub"><span style="color:#9FD46A">+30 lb</span><span class="mut"> · plateau broken</span></p>
+          <p class="cap" id="deckName">Last session</p>
+          <p class="cap-sub" id="deckSub"><span class="mut">Tap Start to log one</span></p>
         </div>
       </div>
 
@@ -193,33 +193,9 @@ h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
       <div id="logger"></div>
     </section>
 
-    <!-- PROGRESS -->
+    <!-- PROGRESS (rendered by JS from logged history) -->
     <section class="screen" data-screen="progress">
-      <p class="lab" style="color:var(--amber);margin-top:14px">Recomp block · Week 3</p>
-      <h1 class="title">Progress</h1>
-
-      <div class="metric" style="margin-top:18px">
-        <div style="display:flex;justify-content:space-between;align-items:center"><span class="lab mut">Barbell Row · top set</span><span class="n" style="font-size:13px;color:var(--amber)">+30 lb</span></div>
-        <svg viewBox="0 0 300 70" preserveAspectRatio="none" style="width:100%;height:70px;margin-top:10px;display:block">
-          <polyline points="8,56 100,52 196,34 292,12" fill="none" stroke="var(--amber)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="292" cy="12" r="4" fill="var(--amber)"/>
-        </svg>
-        <div style="display:flex;justify-content:space-between"><span class="lab mut2">W1 · 215</span><span class="lab" style="color:var(--amber)">W4 · 235</span></div>
-        <p style="margin-top:8px;font-size:13px;color:#9FD46A">Plateau broken — jumped from 225 × 5</p>
-      </div>
-
-      <p class="lab mut section-lab">Recent records</p>
-      <div class="prow"><div><p style="font-size:14px;font-weight:600">Barbell Row</p><p class="mut" style="font-size:12px;margin-top:2px">May 24</p></div><div style="text-align:right"><p class="n" style="font-size:15px;color:var(--amber)">235 × 4</p><p class="lab" style="color:var(--amber);font-size:11px;margin-top:2px">New PR</p></div></div>
-      <div class="prow"><div><p style="font-size:14px;font-weight:600">Smith Bench</p><p class="mut" style="font-size:12px;margin-top:2px">May 23</p></div><p class="n" style="font-size:15px">335 × 1</p></div>
-      <div class="prow"><div><p style="font-size:14px;font-weight:600">Lat Pulldown</p><p class="mut" style="font-size:12px;margin-top:2px">May 24</p></div><p class="n" style="font-size:15px">180 × 8</p></div>
-
-      <p class="lab mut section-lab">Weekly volume</p>
-      <div style="display:flex;align-items:flex-end;gap:8px;height:90px">
-        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:50px;background:rgba(255,255,255,.18);border-radius:5px"></div><span class="lab mut2">W1</span></div>
-        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:62px;background:rgba(255,255,255,.18);border-radius:5px"></div><span class="lab mut2">W2</span></div>
-        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:80px;background:var(--amber);border-radius:5px"></div><span class="lab" style="color:var(--amber)">W3</span></div>
-        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:30px;background:rgba(255,255,255,.1);border-radius:5px"></div><span class="lab mut2">W4</span></div>
-      </div>
+      <div id="progress"></div>
     </section>
 
     <!-- BODY -->
@@ -272,6 +248,7 @@ function go(name){
   document.getElementById('glow').style.opacity=warm?1:0.35;
   document.getElementById('glow2').style.opacity=warm?1:0.6;
   if(name==='train'){ if(S) startClock(); renderLogger(); }
+  if(name==='progress'){ renderProgress(); }
   window.scrollTo(0,0);
 }
 
@@ -350,13 +327,13 @@ function saveLifts(l){ localStorage.setItem('meridian_lifts',JSON.stringify(l));
 var VAL_URL = "https://ryanebert14glitch--1ced3f0a74d611f1947d1607ee4eb77e.web.val.run";
 function pushWidget(){
   try {
-    var st = loadState();
+    var st = loadState(), s = computeStats();
     var payload = {
       date: new Date().toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' }),
       session: st.lastSessionName || "Ready to train",
-      target: "Recomp · Week " + (st.week || 4), moves: 0, recovery: 86,
-      streak: st.streak || 23, weekSessions: (st.week || 4) + "/5",
-      bodyweight: 186.6, lastPR: st.lastSession || "Leg Press 500 × 6",
+      target: (s.weekVol>0 ? kfmt(s.weekVol)+" lb this week" : "Recomp block"), moves: 0, recovery: 86,
+      streak: s.streak, weekSessions: s.weekSessions + "/5",
+      bodyweight: 186.6, lastPR: st.lastSession || "—",
       lastSession: st.lastSession || "—"
     };
     fetch(VAL_URL, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload), keepalive:true }).catch(function(){});
@@ -415,8 +392,7 @@ function finishSession(){
   var lifts=loadLifts();
   S.ex.forEach(function(e){ lifts[e.n]=e.sets.map(function(s){return {w:s.w,r:s.r}}); });
   saveLifts(lifts);
-  var st=loadState(), t=todayStr(); st.history=st.history||[]; st.history.push({date:t,vol:vol,sets:sets});
-  if(st.lastLogged!==t){ st.streak=(st.streak?st.streak+1:24); st.week=(st.week?st.week+1:5); }
+  var st=loadState(), t=todayStr(); st.history=st.history||[]; st.history.push({date:t,name:S.name,vol:vol,sets:sets});
   st.lastSessionName = S.name;
   st.lastSession = S.name + " · " + (vol/1000).toFixed(1) + "k";
   st.lastLogged=t; saveState(st); clearActive(); clearInterval(restTimer); renderLogger(); refreshToday(); pushWidget();
@@ -435,11 +411,63 @@ function renderSummary(){
 }
 function endToToday(){ S=null; clearInterval(clockTimer); go('today'); refreshToday(); }
 
+function parseD(s){ var p=String(s).split('-'); return new Date(+p[0],+p[1]-1,+p[2]); }
+function dayKey(d){ return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function fmtDate(s){ return parseD(s).toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
+function kfmt(v){ return (v/1000).toFixed(1)+'k'; }
+function computeStats(){
+  var hist=(loadState().history)||[];
+  var t0=new Date(); t0=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate());
+  var wk=new Date(t0); wk.setDate(wk.getDate()-6);
+  var weekSessions=0, weekVol=0, totalVol=0, dset={};
+  hist.forEach(function(h){ var d=parseD(h.date); dset[dayKey(d)]=true; totalVol+=h.vol||0; if(d>=wk){ weekSessions++; weekVol+=h.vol||0; } });
+  var streak=0, cur=new Date(t0);
+  if(!dset[dayKey(cur)]) cur.setDate(cur.getDate()-1);
+  while(dset[dayKey(cur)]){ streak++; cur.setDate(cur.getDate()-1); }
+  return { sessions:hist.length, weekSessions:weekSessions, weekVol:weekVol, totalVol:totalVol, streak:streak };
+}
+
 function refreshToday(){
-  var st=loadState();
-  var a=document.getElementById('todayStreak'); if(a) a.textContent=st.streak||23;
-  var b=document.getElementById('todayWeek'); if(b) b.textContent=st.week||4;
-  var bars=document.getElementById('todayBars'); if(bars){ var n=Math.min(5,st.week||4); bars.querySelectorAll('span').forEach(function(sp,i){ sp.className=i<n?'on':''; }); }
+  var st=loadState(), s=computeStats();
+  var a=document.getElementById('todayStreak'); if(a) a.textContent=s.streak;
+  var b=document.getElementById('todayWeek'); if(b) b.textContent=s.weekSessions;
+  var v=document.getElementById('todayVol'); if(v) v.textContent=(s.weekVol>0?kfmt(s.weekVol)+' lb':'0 lb');
+  var bars=document.getElementById('todayBars'); if(bars){ var n=Math.min(5,s.weekSessions); bars.querySelectorAll('span').forEach(function(sp,i){ sp.className=i<n?'on':''; }); }
+  var dn=document.getElementById('deckName'), ds=document.getElementById('deckSub');
+  if(dn&&ds){ if(st.lastSessionName){ dn.textContent=st.lastSessionName; ds.innerHTML='<span style="color:#9FD46A">'+(st.lastSession||'')+'</span>'; } else { dn.textContent='No sessions yet'; ds.innerHTML='<span class="mut">Tap Start to log one</span>'; } }
+}
+
+function renderProgress(){
+  var box=document.getElementById('progress'); if(!box) return;
+  var hist=((loadState().history)||[]).slice(), s=computeStats();
+  var h='<p class="lab" style="color:var(--amber);margin-top:14px">Your training</p><h1 class="title" style="margin-top:8px">Progress</h1>';
+  if(!hist.length){
+    h+='<div style="padding:50px 0;text-align:center"><p class="mut" style="font-size:14px;line-height:1.6">No sessions logged yet.<br>Finish a workout and it lands here.</p><div class="cta" style="margin-top:22px"><button onclick="startSession()"><i class="ti ti-player-play"></i>Start a session</button></div></div>';
+    box.innerHTML=h; return;
+  }
+  h+='<div style="display:flex;gap:10px;margin-top:18px">';
+  h+='<div class="metric sum-stat" style="flex:1"><p class="v n">'+s.sessions+'</p><p class="lab mut2" style="margin-top:4px">Sessions</p></div>';
+  h+='<div class="metric sum-stat" style="flex:1"><p class="v n">'+kfmt(s.totalVol)+'</p><p class="lab mut2" style="margin-top:4px">Total lb</p></div>';
+  h+='<div class="metric sum-stat" style="flex:1"><p class="v n">'+s.streak+'</p><p class="lab mut2" style="margin-top:4px">Streak</p></div></div>';
+  var recent=hist.slice(-8), vols=recent.map(function(x){return x.vol||0});
+  if(recent.length>=2){
+    var mx=Math.max.apply(null,vols), mn=Math.min.apply(null,vols), rng=(mx-mn)||1, W=300, H=70, p=6;
+    var pts=vols.map(function(v,i){ var x=p+(W-2*p)*(i/(vols.length-1)); var y=H-p-(H-2*p)*((v-mn)/rng); return x.toFixed(0)+','+y.toFixed(0); }).join(' ');
+    h+='<p class="lab mut section-lab">Volume · last '+recent.length+' sessions</p>';
+    h+='<div class="metric"><svg viewBox="0 0 300 70" preserveAspectRatio="none" style="width:100%;height:70px;display:block"><polyline points="'+pts+'" fill="none" stroke="var(--amber)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+  }
+  h+='<p class="lab mut section-lab">Recent sessions</p>';
+  hist.slice(-6).reverse().forEach(function(x){
+    h+='<div class="prow"><div><p style="font-size:14px;font-weight:600">'+(x.name||'Session')+'</p><p class="mut" style="font-size:12px;margin-top:2px">'+fmtDate(x.date)+'</p></div><div style="text-align:right"><p class="n" style="font-size:14px">'+kfmt(x.vol||0)+' lb</p><p class="mut" style="font-size:12px;margin-top:2px">'+(x.sets||0)+' sets</p></div></div>';
+  });
+  var lifts=loadLifts(), names=Object.keys(lifts);
+  if(names.length){
+    h+='<p class="lab mut section-lab">Current lifts</p>';
+    names.map(function(n){ var top=lifts[n].reduce(function(a,b){return (b.w>a.w?b:a)},{w:-1,r:0}); return {n:n,w:top.w,r:top.r}; })
+         .sort(function(a,b){return b.w-a.w})
+         .forEach(function(r){ h+='<div class="prow"><p style="font-size:14px;font-weight:600">'+r.n+'</p><p class="n" style="font-size:14px">'+(r.w>0?r.w+' × '+r.r:'BW × '+r.r)+'</p></div>'; });
+  }
+  box.innerHTML=h;
 }
 
 S=loadActive();
