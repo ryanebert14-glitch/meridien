@@ -51,9 +51,8 @@ body{display:flex;justify-content:center;min-height:100dvh}
   font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 .wordmark{font-size:13px;font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:var(--amber);margin-left:4px}
 
-.cards{display:flex;gap:12px;margin-top:18px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
-.cards::-webkit-scrollbar{display:none}
-.glass{flex:0 0 84%;background:var(--glass);backdrop-filter:blur(18px);border:1px solid var(--line);
+.cards{display:flex;gap:12px;margin-top:18px}
+.glass{flex:1;min-width:0;background:var(--glass);backdrop-filter:blur(18px);border:1px solid var(--line);
   border-radius:18px;padding:15px 17px}
 .bars{display:flex;gap:5px;margin:14px 0 11px}
 .bars span{height:3px;flex:1;border-radius:3px;background:rgba(255,255,255,.22)}
@@ -155,7 +154,7 @@ h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
         <div style="flex:1" onclick="startSession()">
           <div class="tile t-session" style="cursor:pointer"><span class="tlab lab">Today</span></div>
           <p class="cap">Start a session</p>
-          <p class="cap-sub"><span style="color:var(--rust)">Pick your workout</span><span class="mut"> · 5 days</span></p>
+          <p class="cap-sub"><span style="color:var(--rust)">Pick your workout</span></p>
         </div>
         <div style="flex:1;padding-top:42px">
           <div class="tile t-detail" style="height:166px"><span class="tlab lab">Recent</span></div>
