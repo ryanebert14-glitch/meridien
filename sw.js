@@ -1,4 +1,4 @@
-const CACHE = 'meridian-v12';
+const CACHE = 'meridian-v13';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
   './images/hero.jpg', './images/session.jpg', './images/detail.jpg',

@@ -112,6 +112,17 @@ h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
 .sum-stat{text-align:center}.sum-stat .v{font-size:30px;font-weight:800}
 .pickrow{display:flex;align-items:center;justify-content:space-between;padding:16px 2px;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer}
 .pickrow:active{background:rgba(255,255,255,.04)}
+.setno{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--mut2);flex:none}
+.lset.done{opacity:.5}
+.stepper{display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,.14);border-radius:9px;overflow:hidden}
+.stepper button{width:28px;height:34px;background:rgba(255,255,255,.05);border:none;color:var(--bone);font-size:17px;font-family:inherit;cursor:pointer;line-height:1}
+.stepper button:active{background:rgba(255,255,255,.16)}
+.stepper .val{min-width:42px;text-align:center;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;cursor:pointer}
+.exacts{display:flex;gap:8px;margin-top:14px}
+.exacts button{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--mut);border-radius:10px;padding:10px 4px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
+.exacts button.on{background:rgba(232,154,60,.18);border-color:var(--amber);color:var(--amber)}
+.exacts button i{font-size:15px}
+.superbadge{width:24px;height:24px;border-radius:6px;background:var(--amber);color:#0B0A09;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex:none}
 </style>
 </head>
 <body>
@@ -339,30 +350,72 @@ function startClock(){ clearInterval(clockTimer); clockTimer=setInterval(functio
 function startRest(sec){ rest=sec; clearInterval(restTimer); var upd=function(){ var el=document.getElementById('restClock'); if(el) el.textContent=rest>0?fmt(rest):'Ready'; }; upd();
   restTimer=setInterval(function(){ rest--; if(rest<=0){clearInterval(restTimer);rest=0;} upd(); },1000); }
 
+var EXPOOL = (function(){ var seen={}, out=[]; DAY_ORDER.forEach(function(k){ PROGRAM[k].ex.forEach(function(e){ if(!seen[e.n]){ seen[e.n]=1; out.push({n:e.n,scheme:e.scheme,cue:e.cue}); } }); }); return out.sort(function(a,b){return a.n.localeCompare(b.n)}); })();
+function group(i){ var s=i; while(s>0 && S.ex[s-1].linkNext) s--; var e=i; while(e<S.ex.length-1 && S.ex[e].linkNext) e++; return [s,e]; }
+function setRow(i,si,s){
+  return '<div class="lset'+(s.done?' done':'')+'">'
+   +'<span class="setno">Set '+pad(si+1)+'</span>'
+   +'<span class="stepper"><button onclick="adjW('+i+','+si+',-5)">−</button><span class="val" onclick="editVal('+i+','+si+')">'+(s.w>0?s.w:'BW')+'</span><button onclick="adjW('+i+','+si+',5)">+</button></span>'
+   +'<span class="stepper"><button onclick="adjR('+i+','+si+',-1)">−</button><span class="val">'+s.r+'</span><button onclick="adjR('+i+','+si+',1)">+</button></span>'
+   +'<span class="chk'+(s.done?' on':'')+'" onclick="toggleSet('+i+','+si+')"><i class="ti ti-check"></i></span></div>';
+}
+function exBlock(i, grouped, letter){
+  var e=S.ex[i], h='';
+  if(grouped) h+='<div style="display:flex;align-items:center;gap:9px;margin-top:20px"><span class="superbadge">'+letter+'</span><h1 class="title" style="font-size:21px;margin:0">'+e.n+'</h1></div>';
+  else h+='<h1 class="title" style="margin-top:8px">'+e.n+'</h1>';
+  var sub=[]; if(e.scheme) sub.push(e.scheme); if(e.last) sub.push('Last '+e.last);
+  if(sub.length) h+='<p class="mut" style="margin-top:'+(grouped?'6':'8')+'px;font-size:13px">'+sub.join('  ·  ')+'</p>';
+  if(e.cue) h+='<p style="margin-top:9px;font-size:13px;color:var(--amber);display:flex;gap:8px;align-items:flex-start;line-height:1.4"><i class="ti ti-bulb" style="font-size:15px;flex:none;margin-top:1px"></i><span>'+e.cue+'</span></p>';
+  h+='<div style="margin-top:14px">';
+  e.sets.forEach(function(s,si){ h+=setRow(i,si,s); });
+  h+='</div><div class="exacts"><button onclick="addSet('+i+')"><i class="ti ti-plus"></i>Set</button><button onclick="swapEx('+i+')"><i class="ti ti-switch-horizontal"></i>Swap</button>';
+  if(i<S.ex.length-1) h+='<button onclick="toggleSuper('+i+')" class="'+(e.linkNext?'on':'')+'"><i class="ti ti-link"></i>'+(e.linkNext?'Linked':'Superset')+'</button>';
+  h+='</div>';
+  return h;
+}
 function renderLogger(){
   var box=document.getElementById('logger'); if(!box) return;
   if(!S){ return renderPicker(); }
   if(S.done){ return renderSummary(); }
-  var e=S.ex[S.ei], n=S.ex.length, el=fmt(Math.floor((Date.now()-S.startedAt)/1000)), h='';
+  if(S.swapping!=null){ return renderSwap(); }
+  var n=S.ex.length, gb=group(S.ei), gs=gb[0], ge=gb[1], isSuper=ge>gs;
+  var el=fmt(Math.floor((Date.now()-S.startedAt)/1000)), h='';
   h+='<div class="lg-head"><span class="lab mut">'+S.name+'</span><span style="display:flex;align-items:center;gap:7px;color:var(--amber)"><span style="width:6px;height:6px;border-radius:50%;background:var(--amber)"></span><span class="n" id="sessClock" style="font-size:13px;font-weight:600">'+el+'</span></span></div>';
-  h+='<div class="lg-prog"><span style="width:'+(S.ei/n*100)+'%"></span></div>';
-  h+='<p class="lab mut" style="margin-top:16px">Movement '+pad(S.ei+1)+' / '+pad(n)+(e.primary?' · <span style="color:var(--amber)">Primary lift</span>':'')+'</p>';
-  h+='<h1 class="title" style="margin-top:8px">'+e.n+'</h1>';
-  var sub=[]; if(e.scheme) sub.push(e.scheme); if(e.last) sub.push('Last '+e.last);
-  if(sub.length) h+='<p class="mut" style="margin-top:8px;font-size:13px">'+sub.join('  ·  ')+'</p>';
-  if(e.cue) h+='<p style="margin-top:11px;font-size:13px;color:var(--amber);display:flex;gap:8px;align-items:flex-start;line-height:1.4"><i class="ti ti-bulb" style="font-size:15px;flex:none;margin-top:1px"></i><span>'+e.cue+'</span></p>';
-  h+='<div style="margin-top:16px">';
-  e.sets.forEach(function(s,si){ h+='<div class="lset'+(s.done?' done':'')+'"><span class="lab mut2" style="letter-spacing:.12em">Set '+pad(si+1)+'</span><span class="lw n" onclick="editSet('+si+')">'+(s.w>0?(s.w+' <span class="mut2">lb</span> × '+s.r):('<span class="mut2">BW</span> × '+s.r))+'</span><span class="chk'+(s.done?' on':'')+'" onclick="toggleSet('+si+')"><i class="ti ti-check"></i></span></div>'; });
-  h+='</div><button class="addset" onclick="addSet()">+ Add set</button>';
+  h+='<div class="lg-prog"><span style="width:'+((ge+1)/n*100)+'%"></span></div>';
+  var lbl=isSuper ? ('Superset · movements '+pad(gs+1)+'–'+pad(ge+1)+' / '+pad(n)) : ('Movement '+pad(gs+1)+' / '+pad(n)+(S.ex[gs].primary?' · <span style="color:var(--amber)">Primary lift</span>':''));
+  h+='<p class="lab mut" style="margin-top:16px">'+lbl+'</p>';
+  for(var i=gs;i<=ge;i++){ h+=exBlock(i, isSuper, String.fromCharCode(65+(i-gs))); }
   h+='<div class="rest"><span class="lab mut" style="display:flex;align-items:center;gap:7px"><i class="ti ti-clock" style="font-size:15px"></i>Rest</span><span class="timer n" id="restClock">'+(rest>0?fmt(rest):'Ready')+'</span></div>';
-  h+='<div class="exnav">'+(S.ei>0?'<button onclick="prevEx()">Previous</button>':'')+(S.ei<n-1?'<button class="primary" onclick="nextEx()">Next movement</button>':'<button class="primary" onclick="finishSession()">Finish session</button>')+'</div>';
+  h+='<div class="exnav">'+(gs>0?'<button onclick="prevEx()">Previous</button>':'')+(ge<n-1?'<button class="primary" onclick="nextEx()">Next movement</button>':'<button class="primary" onclick="finishSession()">Finish session</button>')+'</div>';
   box.innerHTML=h;
 }
-function toggleSet(si){ var s=S.ex[S.ei].sets[si]; s.done=!s.done; saveActive(); if(s.done) startRest(90); renderLogger(); }
-function editSet(si){ var s=S.ex[S.ei].sets[si]; var v=prompt('Weight x reps (e.g. 315x4)', s.w+'x'+s.r); if(v){ var m=v.toLowerCase().split('x'); var w=parseFloat(m[0]), r=parseInt(m[1],10); if(!isNaN(w))s.w=w; if(!isNaN(r))s.r=r; saveActive(); renderLogger(); } }
-function addSet(){ var a=S.ex[S.ei].sets, l=a[a.length-1]||{w:0,r:0}; a.push({w:l.w,r:l.r,done:false}); saveActive(); renderLogger(); }
-function prevEx(){ if(S.ei>0){S.ei--;rest=0;saveActive();renderLogger();} }
-function nextEx(){ if(S.ei<S.ex.length-1){S.ei++;rest=0;saveActive();renderLogger();} }
+function toggleSet(i,si){ var s=S.ex[i].sets[si]; s.done=!s.done; saveActive(); if(s.done) startRest(90); renderLogger(); }
+function adjW(i,si,d){ var s=S.ex[i].sets[si]; s.w=Math.max(0, Math.round((s.w+d)*10)/10); saveActive(); renderLogger(); }
+function adjR(i,si,d){ var s=S.ex[i].sets[si]; s.r=Math.max(0, s.r+d); saveActive(); renderLogger(); }
+function editVal(i,si){ var s=S.ex[i].sets[si]; var v=prompt('Weight in lb (0 = bodyweight)', s.w); if(v!=null){ var w=parseFloat(v); if(!isNaN(w)){ s.w=Math.max(0,w); saveActive(); renderLogger(); } } }
+function addSet(i){ var a=S.ex[i].sets, l=a[a.length-1]||{w:0,r:10}; a.push({w:l.w,r:l.r,done:false}); saveActive(); renderLogger(); }
+function toggleSuper(i){ if(i>=S.ex.length-1) return; S.ex[i].linkNext=!S.ex[i].linkNext; saveActive(); renderLogger(); }
+function prevEx(){ var gs=group(S.ei)[0]; if(gs>0){ S.ei=group(gs-1)[0]; rest=0; saveActive(); renderLogger(); } }
+function nextEx(){ var ge=group(S.ei)[1]; if(ge<S.ex.length-1){ S.ei=ge+1; rest=0; saveActive(); renderLogger(); } }
+function swapEx(i){ S.swapping=i; renderLogger(); }
+function cancelSwap(){ S.swapping=null; renderLogger(); }
+function renderSwap(){
+  var box=document.getElementById('logger'), cur=S.ex[S.swapping];
+  var h='<div class="lg-head"><span class="lab mut">Swap exercise</span><span class="lab" style="color:var(--amber);cursor:pointer" onclick="cancelSwap()">Cancel</span></div>';
+  h+='<h1 class="title" style="margin-top:12px;font-size:24px">Replace<br>'+cur.n+'</h1>';
+  h+='<div style="margin-top:18px"><div class="pickrow" onclick="customSwap()"><p style="font-size:15px;font-weight:700;color:var(--amber)">+ Custom exercise</p><i class="ti ti-plus" style="color:var(--amber);font-size:20px"></i></div>';
+  EXPOOL.forEach(function(x){ if(x.n===cur.n) return; h+='<div class="pickrow" onclick="doSwap(\''+x.n.replace(/'/g,"\\'")+'\')"><div><p style="font-size:15px;font-weight:600">'+x.n+'</p><p class="mut" style="font-size:12px;margin-top:2px">'+(x.scheme||'')+'</p></div><i class="ti ti-arrow-right" style="color:var(--mut);font-size:18px"></i></div>'; });
+  h+='</div>'; box.innerHTML=h;
+}
+function applySwap(name, scheme, cue){
+  var i=S.swapping, lifts=loadLifts(), prev=lifts[name];
+  var sets=(prev&&prev.length)?prev.map(function(s){return {w:s.w,r:s.r,done:false}}):S.ex[i].sets.map(function(s){return {w:s.w,r:s.r,done:false}});
+  var last=(prev&&prev.length)?prev.slice(0,3).map(function(s){return (s.w>0?s.w:'BW')+'×'+s.r}).join(' / '):null;
+  S.ex[i]={ n:name, scheme:scheme, cue:cue, primary:false, last:last, sets:sets, linkNext:S.ex[i].linkNext };
+  S.swapping=null; saveActive(); renderLogger();
+}
+function doSwap(name){ var x=null; for(var j=0;j<EXPOOL.length;j++){ if(EXPOOL[j].n===name){x=EXPOOL[j];break;} } applySwap(name, x?x.scheme:'', x?x.cue:''); }
+function customSwap(){ var nm=prompt('Exercise name'); if(nm&&nm.trim()){ applySwap(nm.trim(), '', ''); } }
 
 function finishSession(){
   S.done=true; var vol=0, sets=0;
@@ -460,6 +513,7 @@ function renderProgress(){
 
 seedBaselines();
 S=loadActive();
+if(S) S.swapping=null;
 refreshToday();
 if(loadState().lastLogged) pushWidget();
 if(S && !S.done){ var rb=document.querySelector('.cta button'); if(rb) rb.innerHTML='<i class="ti ti-player-play"></i>Resume session'; }
