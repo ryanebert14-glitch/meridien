@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#060504">
+<meta name="theme-color" content="#F2ECDD">
 <title>Meridian</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,26 +12,26 @@
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Meridian">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <style>
 :root{
-  --ink:#060504; --bone:#F5F2EC; --amber:#E89A3C; --amber-deep:#C2541A;
-  --green:#8BC34A; --rust:#E5743A; --glass:rgba(28,22,14,.42);
-  --line:rgba(255,255,255,.10); --mut:rgba(245,242,236,.6); --mut2:rgba(245,242,236,.42);
+  --ink:#F2ECDD; --bone:#211E18; --amber:#2C5AA6; --amber-deep:#1E3E70;
+  --green:#2C5AA6; --rust:#2C5AA6; --glass:rgba(255,251,242,.62);
+  --line:rgba(0,0,0,.12); --mut:rgba(33,30,24,.60); --mut2:rgba(33,30,24,.40);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{background:#000;font-family:'Inter',-apple-system,sans-serif;color:var(--bone)}
+html,body{background:#E7DECB;font-family:'Inter',-apple-system,sans-serif;color:var(--bone)}
 body{display:flex;justify-content:center;min-height:100dvh}
 .app{position:relative;width:100%;max-width:440px;background:var(--ink);min-height:100dvh;overflow:hidden;display:flex;flex-direction:column}
 .n{font-variant-numeric:tabular-nums}
 .lab{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
 .mut{color:var(--mut)} .mut2{color:var(--mut2)}
 
-.glow{position:absolute;top:0;left:0;right:0;height:480px;pointer-events:none;background-size:cover;background-position:center 20%;
-  background-image:radial-gradient(125% 95% at 72% -10%,rgba(217,138,43,.62) 0%,rgba(154,88,22,.42) 24%,rgba(60,34,8,.6) 50%,rgba(10,7,5,.93) 76%),url('images/hero.jpg')}
+.glow{position:absolute;top:0;left:0;right:0;height:360px;pointer-events:none;
+  background:radial-gradient(120% 90% at 78% -18%,rgba(44,90,166,.18) 0%,rgba(44,90,166,.06) 34%,rgba(242,236,221,0) 66%)}
 .glow2{position:absolute;top:0;left:0;right:0;height:440px;pointer-events:none;
   background:linear-gradient(180deg,rgba(6,5,4,0) 55%,var(--ink) 100%)}
 
@@ -43,11 +43,11 @@ body{display:flex;justify-content:center;min-height:100dvh}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
 .toprow{display:flex;align-items:center;gap:11px;margin-top:8px}
-.icb{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;
-  align-items:center;justify-content:center;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.14);
+.icb{width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.12);display:flex;
+  align-items:center;justify-content:center;backdrop-filter:blur(8px);border:1px solid rgba(0,0,0,.14);
   font-weight:700;font-size:15px;cursor:pointer}
 .icb i{font-size:19px}
-.pill{margin-left:auto;border:1px solid rgba(255,255,255,.4);border-radius:30px;padding:9px 15px;
+.pill{margin-left:auto;border:1px solid rgba(0,0,0,.4);border-radius:30px;padding:9px 15px;
   font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 .wordmark{font-size:13px;font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:var(--amber);margin-left:4px}
 
@@ -55,17 +55,17 @@ body{display:flex;justify-content:center;min-height:100dvh}
 .glass{flex:1;min-width:0;background:var(--glass);backdrop-filter:blur(18px);border:1px solid var(--line);
   border-radius:18px;padding:15px 17px}
 .bars{display:flex;gap:5px;margin:14px 0 11px}
-.bars span{height:3px;flex:1;border-radius:3px;background:rgba(255,255,255,.22)}
+.bars span{height:3px;flex:1;border-radius:3px;background:rgba(0,0,0,.22)}
 .bars span.on{background:var(--green)}
 
-.hl{font-weight:800;letter-spacing:-.025em;line-height:1.04;color:#fff;font-size:clamp(32px,9vw,40px);margin-top:30px}
+.hl{font-weight:800;letter-spacing:-.025em;line-height:1.04;color:var(--bone);font-size:clamp(32px,9vw,40px);margin-top:30px}
 
 .deck{display:flex;gap:14px;margin-top:32px}
 .vlab{writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:.22em;font-size:11px;padding-top:4px}
 .tile{border-radius:14px;height:178px;position:relative;overflow:hidden;background-size:cover;background-position:center}
-.tile .tlab{position:absolute;top:13px;left:14px;font-size:11px;color:rgba(255,255,255,.88)}
-.t-session{background-color:#5A2208;background-image:linear-gradient(160deg,rgba(240,137,42,.42) 0%,rgba(194,84,26,.35) 45%,rgba(30,10,2,.72) 100%),url('images/session.jpg')}
-.t-detail{background-color:#16242F;background-image:linear-gradient(165deg,rgba(20,12,4,.28) 0%,rgba(11,14,18,.72) 100%),url('images/detail.jpg')}
+.tile .tlab{position:absolute;top:13px;left:14px;font-size:11px;color:rgba(255,255,255,.92)}
+.t-session{background-color:#1b2a44;background-image:linear-gradient(160deg,rgba(44,90,166,.28) 0%,rgba(20,32,58,.5) 45%,rgba(10,16,30,.72) 100%),url('images/session.jpg')}
+.t-detail{background-color:#16202f;background-image:linear-gradient(165deg,rgba(44,90,166,.22) 0%,rgba(10,16,28,.72) 100%),url('images/detail.jpg')}
 .cap{font-weight:700;font-size:16px;margin:11px 0 0;letter-spacing:-.01em;line-height:1.2}
 .cap-sub{margin:5px 0 0;font-size:13px;font-weight:500}
 
@@ -73,56 +73,56 @@ body{display:flex;justify-content:center;min-height:100dvh}
 .stats>div{flex:1}
 .stats .v{font-size:22px;font-weight:800}
 .cta{display:flex;justify-content:center;margin:22px 0 4px}
-.cta button{background:#fff;color:#0A0705;border:none;border-radius:30px;display:flex;align-items:center;
+.cta button{background:var(--amber);color:#fff;border:none;border-radius:30px;display:flex;align-items:center;
   gap:10px;padding:15px 32px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;
-  box-shadow:0 8px 22px rgba(0,0,0,.4)}
+  box-shadow:0 8px 22px rgba(44,90,166,.28)}
 .cta button i{font-size:18px}
 
 h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
 .rest{display:flex;align-items:center;justify-content:space-between;margin-top:16px}
 .timer{font-size:15px;font-weight:600;color:var(--amber)}
-.btn-full{width:100%;margin-top:16px;background:var(--amber);color:#0B0A09;border:none;border-radius:12px;
+.btn-full{width:100%;margin-top:16px;background:var(--amber);color:#ffffff;border:none;border-radius:12px;
   padding:15px;font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;font-family:inherit;cursor:pointer}
 
-.prow{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid rgba(255,255,255,.07)}
+.prow{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid rgba(0,0,0,.07)}
 .prow:first-of-type{border-top:none}
-.metric{background:rgba(255,255,255,.05);border-radius:14px;padding:14px 16px}
+.metric{background:rgba(0,0,0,.05);border-radius:14px;padding:14px 16px}
 
 .nav{position:sticky;bottom:0;display:flex;justify-content:space-between;align-items:center;
-  padding:11px 22px calc(11px + env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,.08);
-  background:rgba(6,5,4,.92);backdrop-filter:blur(12px);z-index:6}
+  padding:11px 22px calc(11px + env(safe-area-inset-bottom));border-top:1px solid rgba(0,0,0,.08);
+  background:rgba(242,236,221,.92);backdrop-filter:blur(12px);z-index:6}
 .nav button{background:none;border:none;color:var(--mut2);font-family:inherit;display:flex;flex-direction:column;
   align-items:center;gap:5px;font-size:11px;font-weight:500;cursor:pointer}
 .nav button i{font-size:23px}
-.nav button.active{color:#fff}
+.nav button.active{color:var(--bone)}
 .section-lab{margin:24px 0 12px}
 .lg-head{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
-.lg-prog{height:3px;background:rgba(255,255,255,.14);border-radius:3px;margin-top:14px;overflow:hidden}
+.lg-prog{height:3px;background:rgba(0,0,0,.14);border-radius:3px;margin-top:14px;overflow:hidden}
 .lg-prog>span{display:block;height:3px;background:var(--amber);border-radius:3px;transition:width .3s}
-.lset{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.lset{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid rgba(0,0,0,.07)}
 .lset.done .lw{color:var(--mut)}
 .lw{font-size:16px;cursor:pointer}
-.chk{width:30px;height:30px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;color:transparent}
-.chk.on{background:var(--green);border-color:var(--green);color:#0B0A09}
+.chk{width:30px;height:30px;border-radius:50%;border:1.5px solid rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;color:transparent}
+.chk.on{background:var(--green);border-color:var(--green);color:#ffffff}
 .chk i{font-size:18px}
 .exnav{display:flex;gap:10px;margin-top:20px}
-.exnav button{flex:1;background:rgba(255,255,255,.06);color:var(--bone);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:14px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer}
-.exnav button.primary{background:var(--amber);color:#0B0A09;border-color:var(--amber)}
-.addset{background:none;border:1px dashed rgba(255,255,255,.22);color:var(--mut);border-radius:10px;padding:10px;width:100%;font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-top:12px;cursor:pointer}
+.exnav button{flex:1;background:rgba(0,0,0,.06);color:var(--bone);border:1px solid rgba(0,0,0,.12);border-radius:12px;padding:14px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer}
+.exnav button.primary{background:var(--amber);color:#ffffff;border-color:var(--amber)}
+.addset{background:none;border:1px dashed rgba(0,0,0,.22);color:var(--mut);border-radius:10px;padding:10px;width:100%;font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-top:12px;cursor:pointer}
 .sum-stat{text-align:center}.sum-stat .v{font-size:30px;font-weight:800}
-.pickrow{display:flex;align-items:center;justify-content:space-between;padding:16px 2px;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer}
-.pickrow:active{background:rgba(255,255,255,.04)}
+.pickrow{display:flex;align-items:center;justify-content:space-between;padding:16px 2px;border-bottom:1px solid rgba(0,0,0,.08);cursor:pointer}
+.pickrow:active{background:rgba(0,0,0,.04)}
 .setno{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--mut2);flex:none}
 .lset.done{opacity:.5}
-.stepper{display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,.14);border-radius:9px;overflow:hidden}
-.stepper button{width:28px;height:34px;background:rgba(255,255,255,.05);border:none;color:var(--bone);font-size:17px;font-family:inherit;cursor:pointer;line-height:1}
-.stepper button:active{background:rgba(255,255,255,.16)}
+.stepper{display:inline-flex;align-items:center;border:1px solid rgba(0,0,0,.14);border-radius:9px;overflow:hidden}
+.stepper button{width:28px;height:34px;background:rgba(0,0,0,.05);border:none;color:var(--bone);font-size:17px;font-family:inherit;cursor:pointer;line-height:1}
+.stepper button:active{background:rgba(0,0,0,.16)}
 .stepper .val{min-width:42px;text-align:center;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;cursor:pointer}
 .exacts{display:flex;gap:8px;margin-top:14px}
-.exacts button{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--mut);border-radius:10px;padding:10px 4px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
+.exacts button{flex:1;background:rgba(0,0,0,.05);border:1px solid rgba(0,0,0,.12);color:var(--mut);border-radius:10px;padding:10px 4px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
 .exacts button.on{background:rgba(232,154,60,.18);border-color:var(--amber);color:var(--amber)}
 .exacts button i{font-size:15px}
-.superbadge{width:24px;height:24px;border-radius:6px;background:var(--amber);color:#0B0A09;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex:none}
+.superbadge{width:24px;height:24px;border-radius:6px;background:var(--amber);color:#ffffff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex:none}
 </style>
 </head>
 <body>
@@ -147,7 +147,7 @@ h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
           <span class="lab mut">This week</span>
           <div class="bars" id="todayBars"><span></span><span></span><span></span><span></span><span></span></div>
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <span class="n" style="font-size:14px;font-weight:500;color:rgba(245,242,236,.82)"><span id="todayWeek">0</span> / 5 sessions</span>
+            <span class="n" style="font-size:14px;font-weight:500;color:rgba(33,30,24,.82)"><span id="todayWeek">0</span> / 5 sessions</span>
             <span class="n" id="todayVol" style="font-size:14px;font-weight:600;color:var(--green)">0 lb</span>
           </div>
         </div>
@@ -204,7 +204,7 @@ h1.title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
       <div class="prow"><span class="mut">Lifts tracked</span><span class="n" id="youLifts">0</span></div>
       <div class="prow"><span class="mut">Day streak</span><span class="n" id="youStreak">0</span></div>
       <div class="prow"><span class="mut">Member since</span><span>May 2026</span></div>
-      <button class="btn-full" style="margin-top:24px;background:none;border:1px solid rgba(255,255,255,.2);color:var(--mut)" onclick="resetData()">Reset all data</button>
+      <button class="btn-full" style="margin-top:24px;background:none;border:1px solid rgba(0,0,0,.2);color:var(--mut)" onclick="resetData()">Reset all data</button>
     </section>
 
   </div>
@@ -466,7 +466,7 @@ function refreshToday(){
   var v=document.getElementById('todayVol'); if(v) v.textContent=(s.weekVol>0?kfmt(s.weekVol)+' lb':'0 lb');
   var bars=document.getElementById('todayBars'); if(bars){ var n=Math.min(5,s.weekSessions); bars.querySelectorAll('span').forEach(function(sp,i){ sp.className=i<n?'on':''; }); }
   var dn=document.getElementById('deckName'), ds=document.getElementById('deckSub');
-  if(dn&&ds){ if(st.lastSessionName){ dn.textContent=st.lastSessionName; ds.innerHTML='<span style="color:#9FD46A">'+(st.lastSession||'')+'</span>'; } else { dn.textContent='No sessions yet'; ds.innerHTML='<span class="mut">Tap Start to log one</span>'; } }
+  if(dn&&ds){ if(st.lastSessionName){ dn.textContent=st.lastSessionName; ds.innerHTML='<span style="color:var(--amber)">'+(st.lastSession||'')+'</span>'; } else { dn.textContent='No sessions yet'; ds.innerHTML='<span class="mut">Tap Start to log one</span>'; } }
   var st2=document.getElementById('todaySessTotal'); if(st2) st2.textContent=s.sessions;
   var tv=document.getElementById('todayTotalVol'); if(tv) tv.textContent=(s.totalVol>0?kfmt(s.totalVol):'0');
   var yl=document.getElementById('youLifts'); if(yl) yl.textContent=Object.keys(loadLifts()).length;

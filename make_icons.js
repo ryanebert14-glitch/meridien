@@ -15,7 +15,7 @@ function png(w, h, rgba){
 function makeIcon(size){
   const buf = Buffer.alloc(size*size*4);
   const cx = size/2, cy = size/2, R = size*0.32, ringT = size*0.058, lineT = size*0.034;
-  const bg = [0x0A,0x09,0x08], brass = [0xB8,0x9B,0x5E];
+  const bg = [0xF2,0xEC,0xDD], brass = [0x2C,0x5A,0xA6];
   const SS = [[0.25,0.25],[0.75,0.25],[0.25,0.75],[0.75,0.75]];
   for (let y=0;y<size;y++) for (let x=0;x<size;x++){
     let r=0,g=0,b=0;

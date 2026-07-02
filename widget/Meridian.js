@@ -4,12 +4,12 @@
 const DATA_URL = "https://ryanebert14glitch--1ced3f0a74d611f1947d1607ee4eb77e.web.val.run";
 const APP_URL  = "https://ryanebert14glitch--1ced3f0a74d611f1947d1607ee4eb77e.web.val.run";
 
-const BRASS = new Color("#B89B5E");
-const BONE  = new Color("#F5F2EC");
-const RUST  = new Color("#E5743A");
-const GREEN = new Color("#9FD46A");
-const MUT   = new Color("#8B857A");
-const INK   = new Color("#0A0908");
+const BRASS = new Color("#2C5AA6");
+const BONE  = new Color("#211E18");
+const RUST  = new Color("#2C5AA6");
+const GREEN = new Color("#2C5AA6");
+const MUT   = new Color("#6E6A61");
+const INK   = new Color("#F2ECDD");
 
 const fallback = {
   date: "Today", session: "Ready to train", target: "Pick your workout",
@@ -35,7 +35,7 @@ w.url = "https://ryanebert14-glitch.github.io/meridien/";
 w.refreshAfterDate = new Date(Date.now() + 30 * 60 * 1000);
 w.setPadding(15, 17, 15, 17);
 const g = new LinearGradient();
-g.colors = [new Color("#3A2208"), INK];
+g.colors = [new Color("#E9EDF5"), INK];
 g.locations = [0, 0.7];
 g.startPoint = new Point(1, 0);
 g.endPoint = new Point(0, 1);
@@ -44,7 +44,7 @@ w.backgroundGradient = g;
 function meter(pct, width) {
   const h = 4, ctx = new DrawContext();
   ctx.size = new Size(width, h); ctx.opaque = false; ctx.respectScreenScale = true;
-  ctx.setFillColor(new Color("#FFFFFF", 0.16)); ctx.fillRect(new Rect(0, 0, width, h));
+  ctx.setFillColor(new Color("#000000", 0.12)); ctx.fillRect(new Rect(0, 0, width, h));
   ctx.setFillColor(BRASS); ctx.fillRect(new Rect(0, 0, width * Math.max(0, Math.min(1, pct)), h));
   return ctx.getImage();
 }
